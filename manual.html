@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Manual — Compromissos Time B e Controladoria | Peixoto &amp; Cury</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:   #051520; --navy2:  #0a2235; --cyan:   #00A9E0; --white:  #FFFFFF;
+  --text:   #e8edf3; --muted:  #7a9bb5; --border: rgba(0,169,224,.18);
+  --card:   rgba(255,255,255,.04); --green:  #27AE60; --amber:  #E67E22;
+  --red:    #e74c3c; --purple: #A78BFA;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Sora',sans-serif;background:var(--navy);color:var(--text);min-height:100vh;overflow-x:hidden;font-size:13px;}
+body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 70% 50% at 10% 0%, rgba(0,169,224,.08) 0%, transparent 60%),radial-gradient(ellipse 50% 40% at 90% 100%, rgba(0,59,92,.15) 0%, transparent 55%);pointer-events:none;}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(0,169,224,.25);border-radius:4px;}
+.header{position:relative;z-index:10;position:sticky;top:0;padding:20px 48px;border-bottom:1px solid var(--border);background:rgba(5,21,32,.85);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:space-between;gap:24px;}
+.lw-mark{display:flex;flex-direction:column;line-height:1;}
+.lw-wordmark{display:flex;align-items:flex-end;}
+.lw-law{font-size:26px;font-weight:800;color:#fff;letter-spacing:-1px;}
+.lw-col{display:flex;flex-direction:column;align-items:flex-start;}
+.lw-mod{font-size:9px;font-weight:400;color:rgba(255,255,255,.75);letter-spacing:.8px;align-self:flex-end;}
+.lw-gico{font-size:26px;font-weight:300;color:#fff;letter-spacing:-1px;line-height:1;}
+.lw-tag{font-size:8px;color:rgba(255,255,255,.6);letter-spacing:3px;font-weight:400;margin-top:2px;}
+.header-right{text-align:right;}
+.firm-name{font-size:12px;font-weight:600;color:var(--white);opacity:.85;}
+.firm-sub{font-size:10px;color:var(--muted);margin-top:2px;}
+.manual-badge{display:inline-block;margin-top:8px;background:rgba(0,169,224,.15);border:1px solid var(--border);color:var(--cyan);font-size:10px;font-weight:700;padding:3px 12px;border-radius:20px;letter-spacing:.5px;}
+.open-app-btn{display:inline-flex;align-items:center;gap:6px;margin-top:10px;background:var(--cyan);color:var(--navy);font-size:11px;font-weight:700;padding:7px 16px;border-radius:8px;text-decoration:none;}
+.hero{position:relative;z-index:5;padding:56px 48px 40px;border-bottom:1px solid var(--border);}
+.hero-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(0,169,224,.10);border:1px solid rgba(0,169,224,.25);color:var(--cyan);font-size:10px;font-weight:700;padding:5px 16px;border-radius:20px;letter-spacing:1px;text-transform:uppercase;margin-bottom:20px;}
+.hero-tag::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--cyan);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
+.hero h1{font-size:36px;font-weight:800;color:#fff;line-height:1.15;letter-spacing:-.5px;margin-bottom:12px;}
+.hero h1 span{color:var(--cyan);}
+.hero p{font-size:14.5px;color:var(--muted);line-height:1.7;max-width:700px;}
+.toc{position:relative;z-index:5;padding:28px 48px;border-bottom:1px solid var(--border);background:var(--card);}
+.toc-title{font-size:10px;font-weight:700;color:var(--cyan);text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px;}
+.toc-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid var(--border);text-decoration:none;color:var(--muted);font-size:12px;font-weight:500;transition:all .2s;}
+.toc-item:hover{background:rgba(0,169,224,.10);border-color:var(--cyan);color:var(--cyan);}
+.toc-num{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--cyan);font-weight:600;width:18px;flex-shrink:0;}
+.content{position:relative;z-index:5;max-width:920px;margin:0 auto;padding:0 48px 80px;}
+.section{margin-top:56px;}
+.sec-anchor{display:block;position:relative;top:-90px;visibility:hidden;}
+.sec-header{display:flex;align-items:center;gap:16px;margin-bottom:26px;}
+.sec-num{width:36px;height:36px;border-radius:10px;flex-shrink:0;background:rgba(0,169,224,.15);border:1px solid rgba(0,169,224,.3);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:var(--cyan);}
+.sec-title{font-size:21px;font-weight:700;color:#fff;letter-spacing:-.3px;}
+.sec-line{flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent);}
+p{font-size:13.5px;color:var(--muted);line-height:1.8;margin-bottom:14px;}
+p strong{color:var(--text);}
+.alert{display:flex;align-items:flex-start;gap:14px;padding:16px 20px;border-radius:12px;margin-bottom:20px;}
+.alert.info{background:rgba(0,169,224,.08);border:1px solid rgba(0,169,224,.25);}
+.alert.warn{background:rgba(230,126,34,.08);border:1px solid rgba(230,126,34,.25);}
+.alert.good{background:rgba(39,174,96,.08);border:1px solid rgba(39,174,96,.25);}
+.alert-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
+.alert-body{font-size:12.5px;color:var(--muted);line-height:1.7;}
+.alert-body strong{color:var(--text);}
+.alert.info .alert-body strong{color:var(--cyan);}
+.alert.warn .alert-body strong{color:var(--amber);}
+.alert.good .alert-body strong{color:var(--green);}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:24px;}
+.mini-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;}
+.mini-card .tag{display:inline-block;border-radius:6px;padding:3px 10px;font-size:10px;font-weight:700;margin-bottom:10px;letter-spacing:.3px;}
+.mini-card .tag.cyan{background:rgba(0,169,224,.15);color:var(--cyan);border:1px solid rgba(0,169,224,.3);}
+.mini-card .tag.amber{background:rgba(230,126,34,.15);color:var(--amber);border:1px solid rgba(230,126,34,.3);}
+.mini-card .tag.green{background:rgba(39,174,96,.15);color:var(--green);border:1px solid rgba(39,174,96,.3);}
+.mini-card p{font-size:12px;margin:0;line-height:1.6;}
+.faq{display:flex;flex-direction:column;gap:10px;margin-bottom:24px;}
+.faq-item{padding:16px 20px;border-radius:12px;background:var(--card);border:1px solid var(--border);}
+.faq-q{font-size:13px;font-weight:700;color:#fff;margin-bottom:6px;display:flex;gap:8px;}
+.faq-q::before{content:'?';color:var(--cyan);font-weight:800;}
+.faq-a{font-size:12.5px;color:var(--muted);line-height:1.7;margin:0;}
+.footer{position:relative;z-index:5;margin:0 48px 40px;padding:20px 28px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--muted);flex-wrap:wrap;gap:10px;}
+.back-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(0,169,224,.12);border:1px solid rgba(0,169,224,.3);color:var(--cyan);font-size:11px;font-weight:700;padding:6px 16px;border-radius:8px;text-decoration:none;transition:all .2s;}
+.back-btn:hover{background:rgba(0,169,224,.22);}
+@media(max-width:768px){.header,.hero,.toc,.content,.footer{padding-left:20px;padding-right:20px;}.hero h1{font-size:26px;}.toc-grid{grid-template-columns:1fr 1fr;}.footer{flex-direction:column;}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="lw-mark">
+    <div class="lw-wordmark"><span class="lw-law">LAW</span><div class="lw-col"><span class="lw-mod">compromissos</span><span class="lw-gico">gico</span></div></div>
+    <div class="lw-tag">lawyers at work</div>
+  </div>
+  <div class="header-right">
+    <div class="firm-name">Peixoto &amp; Cury Advogados</div>
+    <div class="firm-sub">Controladoria — Time B</div>
+    <div class="manual-badge">Manual do Usuário</div><br>
+    <a class="open-app-btn" href="https://peixotoecury.github.io/compromissos/" target="_blank">▶ Abrir o sistema</a>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-tag">Manual do usuário</div>
+  <h1>LAWgico Compromissos <span>— Time B e Controladoria</span></h1>
+  <p>Painel que calcula, todo dia, o que cada pessoa do Time B e da Controladoria Geral precisa entregar — pautas, relatórios e atividades recorrentes — e manda um lembrete automático por e-mail. Cada item pode ser marcado como entregue, criando um histórico real de cumprimento.</p>
+</div>
+
+<div class="toc">
+  <div class="toc-title">Neste manual</div>
+  <div class="toc-grid">
+    <a class="toc-item" href="#visao-geral"><span class="toc-num">01</span> Visão geral</a>
+    <a class="toc-item" href="#fontes"><span class="toc-num">02</span> De onde vêm os compromissos</a>
+    <a class="toc-item" href="#painel"><span class="toc-num">03</span> Usando o painel</a>
+    <a class="toc-item" href="#email"><span class="toc-num">04</span> O e-mail diário</a>
+    <a class="toc-item" href="#faq"><span class="toc-num">05</span> Perguntas frequentes</a>
+  </div>
+</div>
+
+<div class="content">
+
+  <div class="section">
+    <span class="sec-anchor" id="visao-geral"></span>
+    <div class="sec-header"><div class="sec-num">01</div><div class="sec-title">Visão Geral</div><div class="sec-line"></div></div>
+    <p>O módulo fica publicado em <strong>peixotoecury.github.io/compromissos</strong>, sem instalação nem login. Todo dia útil de manhã, um script calcula automaticamente quais compromissos vencem naquele dia (pautas, relatórios, atividades diárias) e:</p>
+    <div class="card-grid">
+      <div class="mini-card"><span class="tag cyan">📋 Cria a pendência no painel</span><p>Aparece na lista do dia, pra você e pra coordenação verem.</p></div>
+      <div class="mini-card"><span class="tag amber">✉️ Manda um e-mail</span><p>Só com os itens daquela pessoa (mais qualquer atraso acumulado), com link direto pro painel.</p></div>
+      <div class="mini-card"><span class="tag green">✅ Some quando marcado</span><p>Cada um marca "Entreguei" no painel — fica registrado com data/hora.</p></div>
+    </div>
+    <div class="alert info">
+      <div class="alert-icon">💡</div>
+      <div class="alert-body"><strong>Sem login.</strong> Qualquer um com o link acessa. Use o filtro "Pessoa" pra ver só os seus itens (o link do e-mail já vem com esse filtro aplicado).</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <span class="sec-anchor" id="fontes"></span>
+    <div class="sec-header"><div class="sec-num">02</div><div class="sec-title">De onde vêm os compromissos</div><div class="sec-line"></div></div>
+    <p>Os compromissos vêm da planilha <strong>"Divisão do time B e Controladoria"</strong> (abas Atividades do time / Datas - Pauta / Relatórios - Data), mais alguns itens da Equipe Controladoria Geral cadastrados manualmente. Um script (não automático — roda quando alguém pede) relê a planilha e atualiza o catálogo sempre que ela muda.</p>
+    <div class="alert warn">
+      <div class="alert-icon">⚠️</div>
+      <div class="alert-body"><strong>Nem tudo vira lembrete automático.</strong> Só compromissos com um dia certo calculável (diário, um dia da semana específico, um dia do mês) disparam sozinhos. Itens com periodicidade vaga na planilha ("Semanal"/"Mensal" sem dia definido, "Quando solicitado", "De acordo com a demanda") continuam existindo como referência, mas não geram pendência automática — porque não tem como saber "vence hoje" com segurança.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <span class="sec-anchor" id="painel"></span>
+    <div class="sec-header"><div class="sec-num">03</div><div class="sec-title">Usando o Painel</div><div class="sec-line"></div></div>
+    <p><strong>Visão coordenadora</strong> (filtro "Pessoa" = Todos): mostra um card de resumo por pessoa (atrasados/pendentes/entregues) e a lista completa — é o que fecha a visibilidade de quem está cumprindo e quem não está.</p>
+    <p><strong>Visão pessoa</strong>: selecione o nome no filtro (ou chegue direto pelo link do e-mail) pra ver só os seus itens. Clique em <strong>"✅ Entreguei"</strong> assim que terminar — dá pra desfazer clicando em "↩ Desfazer" se marcar errado.</p>
+    <p>Os filtros de Status, Data e Busca funcionam junto — por exemplo, "Status: Só atrasados" + um nome mostra só o que aquela pessoa está devendo de dias anteriores. O botão "⬇ Exportar Excel" baixa exatamente a lista filtrada na tela.</p>
+  </div>
+
+  <div class="section">
+    <span class="sec-anchor" id="email"></span>
+    <div class="sec-header"><div class="sec-num">04</div><div class="sec-title">O E-mail Diário</div><div class="sec-line"></div></div>
+    <p>Sai automaticamente (Outlook, sem clique manual) uma vez por dia útil, um e-mail por pessoa, listando os itens de hoje e qualquer atraso acumulado, com um link "Meus compromissos" que já abre o painel filtrado no nome da pessoa.</p>
+    <div class="alert good">
+      <div class="alert-icon">🔒</div>
+      <div class="alert-body"><strong>Modo teste.</strong> Enquanto a ferramenta está sendo validada, todos os e-mails chegam só pra Controladoria (com o nome de quem receberia no assunto, entre colchetes), pra conferir se as regras bateram certo antes de ativar o envio direto pra cada pessoa.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <span class="sec-anchor" id="faq"></span>
+    <div class="sec-header"><div class="sec-num">05</div><div class="sec-title">Perguntas Frequentes</div><div class="sec-line"></div></div>
+    <div class="faq">
+      <div class="faq-item"><div class="faq-q">Marquei "Entreguei" errado, como desfaço?</div><p class="faq-a">Clique em "↩ Desfazer" na mesma linha — volta pra pendente.</p></div>
+      <div class="faq-item"><div class="faq-q">Meu nome não aparece no painel</div><p class="faq-a">Avise a Controladoria — pode ser um e-mail ainda não resolvido no cadastro (acontece com pessoas muito novas no roster).</p></div>
+      <div class="faq-item"><div class="faq-q">Um compromisso que eu tenho não aparece na lista</div><p class="faq-a">Provavelmente a periodicidade dele na planilha de origem é vaga demais pra calcular "vence hoje" (ver seção 02) — ele existe, mas não dispara sozinho ainda.</p></div>
+      <div class="faq-item"><div class="faq-q">A planilha mudou (cliente novo, pessoa nova) — o painel atualiza sozinho?</div><p class="faq-a">Não — é preciso rodar de novo o script de sincronização depois de qualquer mudança na planilha de origem.</p></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <div>Peixoto &amp; Cury Advogados · <strong>LAWgico</strong> · Compromissos</div>
+  <a class="back-btn" href="index.html">← Voltar ao Sistema</a>
+</div>
+
+</body>
+</html>

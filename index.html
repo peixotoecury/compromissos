@@ -52,6 +52,11 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:13
 .topbar-right{display:flex;align-items:center;gap:10px;}
 .hub-link{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600;text-decoration:none;font-family:'Sora',sans-serif;white-space:nowrap;}
 
+.tab-bar{background:var(--surface);border-bottom:1px solid var(--border2);padding:0 24px;display:flex;gap:4px;box-shadow:0 2px 10px rgba(0,59,92,.05);overflow-x:auto;}
+.tab-btn{background:none;border:none;padding:14px 18px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;font-family:var(--font);border-bottom:3px solid transparent;transition:all .15s;white-space:nowrap;}
+.tab-btn:hover{color:var(--escuro-pc);}
+.tab-btn.active{color:var(--escuro-pc);border-bottom-color:var(--azul-pc);}
+
 .main{max-width:1200px;margin:0 auto;padding:22px 24px 60px;}
 
 .filters-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);box-shadow:var(--shadow-pc);padding:18px 20px;margin-bottom:18px;display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;}
@@ -62,14 +67,19 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:13
 .btn-cyan:hover{background:var(--escuro-pc);}
 .export-btn{background:none;border:1px solid var(--border2);border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;font-family:var(--font);margin-left:10px;}
 
-.resumo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:20px;}
+.resumo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:20px;}
 .resumo-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);box-shadow:var(--shadow-pc);padding:14px 16px;}
-.resumo-card .nome{font-size:13px;font-weight:700;color:var(--escuro-pc);margin-bottom:6px;}
-.resumo-card .contagem{display:flex;gap:10px;font-size:11px;}
-.resumo-card .contagem span{padding:2px 8px;border-radius:10px;font-weight:700;}
-.resumo-card .pendentes{background:var(--orange-lt);color:var(--orange);}
-.resumo-card .atrasados{background:var(--red-lt);color:var(--red);}
-.resumo-card .entregues{background:var(--green-lt);color:var(--green);}
+.resumo-card .nome{font-size:13px;font-weight:700;color:var(--escuro-pc);margin-bottom:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.resumo-card .contagem{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+.resumo-card .stat{text-align:center;border-radius:8px;padding:7px 4px 6px;}
+.resumo-card .stat .num{display:block;font-size:17px;font-weight:800;line-height:1.15;}
+.resumo-card .stat .lbl{display:block;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.2px;margin-top:2px;white-space:nowrap;}
+.resumo-card .stat.atrasados{background:var(--red-lt);}
+.resumo-card .stat.atrasados .num, .resumo-card .stat.atrasados .lbl{color:var(--red);}
+.resumo-card .stat.pendentes{background:var(--orange-lt);}
+.resumo-card .stat.pendentes .num, .resumo-card .stat.pendentes .lbl{color:var(--orange);}
+.resumo-card .stat.entregues{background:var(--green-lt);}
+.resumo-card .stat.entregues .num, .resumo-card .stat.entregues .lbl{color:var(--green);}
 
 .dash-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);box-shadow:var(--shadow-pc);margin-bottom:18px;overflow:hidden;}
 .dash-card-head{background:var(--surface2);border-bottom:1px solid var(--border2);padding:14px 20px;font-size:14px;font-weight:700;color:var(--escuro-pc);display:flex;align-items:center;justify-content:space-between;}
@@ -114,6 +124,12 @@ table.comp-table tr:hover td{background:var(--surface2);}
   <div class="topbar-right">
     <a class="hub-link" href="manual.html" target="_blank">📖 Manual</a>
   </div>
+</div>
+
+<div class="tab-bar">
+  <button class="tab-btn active" id="tab-btn-geral" onclick="mudarAba('geral')">📋 Geral</button>
+  <button class="tab-btn" id="tab-btn-relatorio" onclick="mudarAba('relatorio')">📊 Relatórios</button>
+  <button class="tab-btn" id="tab-btn-pauta" onclick="mudarAba('pauta')">📅 Pauta</button>
 </div>
 
 <div class="main">
@@ -190,6 +206,19 @@ function toast(msg, isError){
 }
 
 let ENTREGAS = [];
+let ABA_ATIVA = 'geral';
+
+function mudarAba(aba){
+  ABA_ATIVA = aba;
+  ['geral','relatorio','pauta'].forEach(a => document.getElementById('tab-btn-'+a).classList.toggle('active', a === aba));
+  popularSelectPessoas();
+  renderTudo();
+}
+
+function entregasDaAba(){
+  if(ABA_ATIVA === 'geral') return ENTREGAS;
+  return ENTREGAS.filter(e => e.compromissos_definicoes.origem === ABA_ATIVA);
+}
 
 async function carregar(){
   try{
@@ -214,7 +243,7 @@ async function carregar(){
 function popularSelectPessoas(){
   const sel = document.getElementById('f-pessoa');
   const atual = sel.value;
-  const nomes = [...new Set(ENTREGAS.map(e => e.compromissos_definicoes.responsavel_nome).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+  const nomes = [...new Set(entregasDaAba().map(e => e.compromissos_definicoes.responsavel_nome).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
   sel.innerHTML = '<option value="">Todos (visão coordenadora)</option>' + nomes.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join('');
   sel.value = atual;
 }
@@ -231,7 +260,7 @@ function filtrarEntregas(){
   const ate = document.getElementById('f-data-ate').value;
   const busca = document.getElementById('f-busca').value.toLowerCase();
 
-  return ENTREGAS.filter(e => {
+  return entregasDaAba().filter(e => {
     const d = e.compromissos_definicoes;
     const classe = classificar(e);
     if(pessoa && d.responsavel_nome !== pessoa) return false;
@@ -250,7 +279,7 @@ function filtrarEntregas(){
 
 function renderResumo(){
   const porPessoa = {};
-  for(const e of ENTREGAS){
+  for(const e of entregasDaAba()){
     const nome = e.compromissos_definicoes.responsavel_nome || '—';
     porPessoa[nome] = porPessoa[nome] || { pendente:0, atrasado:0, entregue:0 };
     porPessoa[nome][classificar(e)]++;
@@ -261,11 +290,11 @@ function renderResumo(){
   wrap.innerHTML = nomes.map(nome => {
     const c = porPessoa[nome];
     return `<div class="resumo-card">
-      <div class="nome">${esc(nome)}</div>
+      <div class="nome" title="${esc(nome)}">${esc(nome)}</div>
       <div class="contagem">
-        <span class="atrasados">${c.atrasado} atrasado${c.atrasado!==1?'s':''}</span>
-        <span class="pendentes">${c.pendente} pendente${c.pendente!==1?'s':''}</span>
-        <span class="entregues">${c.entregue} entregue${c.entregue!==1?'s':''}</span>
+        <div class="stat atrasados"><span class="num">${c.atrasado}</span><span class="lbl">Atrasado${c.atrasado!==1?'s':''}</span></div>
+        <div class="stat pendentes"><span class="num">${c.pendente}</span><span class="lbl">Pendente${c.pendente!==1?'s':''}</span></div>
+        <div class="stat entregues"><span class="num">${c.entregue}</span><span class="lbl">Entregue${c.entregue!==1?'s':''}</span></div>
       </div>
     </div>`;
   }).join('');
