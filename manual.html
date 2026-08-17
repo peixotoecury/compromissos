@@ -147,6 +147,11 @@ p strong{color:var(--text);}
     <p><strong>Visão coordenadora</strong> (filtro "Pessoa" = Todos): mostra um card de resumo por pessoa (atrasados/pendentes/entregues) e a lista completa — é o que fecha a visibilidade de quem está cumprindo e quem não está.</p>
     <p><strong>Visão pessoa</strong>: selecione o nome no filtro (ou chegue direto pelo link do e-mail) pra ver só os seus itens. Clique em <strong>"✅ Entreguei"</strong> assim que terminar — dá pra desfazer clicando em "↩ Desfazer" se marcar errado.</p>
     <p>Os filtros de Status, Data e Busca funcionam junto — por exemplo, "Status: Só atrasados" + um nome mostra só o que aquela pessoa está devendo de dias anteriores. O botão "⬇ Exportar Excel" baixa exatamente a lista filtrada na tela.</p>
+    <p><strong>"⚙️ Editar regra"</strong>: em cada linha, abre um formulário pra trocar a recorrência daquele compromisso (Diária / Dia(s) da semana / Todo final de mês / Dia do mês / Sem lembrete automático) ou desativá-lo por completo — sem precisar mexer na planilha de origem. Útil pra corrigir casos em que algo foi marcado como diário mas não precisa ser.</p>
+    <div class="alert warn">
+      <div class="alert-icon">⏱️</div>
+      <div class="alert-body">A edição de regra vale <strong>a partir do próximo cálculo diário</strong> — não altera pendências que já foram criadas antes da mudança.</div>
+    </div>
   </div>
 
   <div class="section">

@@ -107,6 +107,23 @@ table.comp-table tr:hover td{background:var(--surface2);}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(-6px);}
 #toast.error{background:var(--red);}
 
+.modal-overlay{position:fixed;inset:0;background:rgba(0,59,92,.45);display:none;align-items:center;justify-content:center;z-index:500;padding:20px;}
+.modal-overlay.show{display:flex;}
+.modal-box{background:var(--surface);border-radius:var(--radius-lg);box-shadow:0 20px 50px rgba(0,0,0,.3);max-width:460px;width:100%;max-height:90vh;overflow-y:auto;}
+.modal-head{padding:18px 22px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;}
+.modal-head h3{font-size:14px;color:var(--escuro-pc);}
+.modal-close{background:none;border:none;font-size:18px;color:var(--muted);cursor:pointer;line-height:1;}
+.modal-body{padding:18px 22px;}
+.modal-body .item-info{font-size:12px;color:var(--muted);background:var(--surface2);border-radius:var(--radius);padding:10px 12px;margin-bottom:16px;}
+.modal-body .item-info strong{color:var(--text);}
+.mc-form-group{margin-bottom:14px;}
+.mc-form-group label{display:block;font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;}
+.mc-form-group select, .mc-form-group input{width:100%;border:1px solid var(--border2);border-radius:var(--radius);padding:9px 12px;font-size:13px;font-family:var(--font);background:var(--surface2);color:var(--text);}
+.dias-semana-grid{display:flex;gap:6px;flex-wrap:wrap;}
+.dia-check{display:flex;align-items:center;gap:5px;font-size:11.5px;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:6px 9px;cursor:pointer;}
+.checkbox-row{display:flex;align-items:center;gap:8px;font-size:12.5px;margin-top:4px;}
+.modal-foot{padding:16px 22px;border-top:1px solid var(--border2);display:flex;justify-content:flex-end;gap:10px;}
+
 @media(max-width:768px){
   .main{padding:14px 12px 40px;}
   .filters-card{flex-direction:column;align-items:stretch;}
@@ -187,6 +204,54 @@ table.comp-table tr:hover td{background:var(--surface2);}
 </div>
 
 <div id="toast"></div>
+
+<div class="modal-overlay" id="modal-editar">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>⚙️ Editar regra do compromisso</h3>
+      <button class="modal-close" onclick="fecharEdicao()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="item-info" id="edit-info"></div>
+      <div class="mc-form-group">
+        <label>Recorrência</label>
+        <select id="edit-regra-tipo" onchange="atualizarCamposEdicao()">
+          <option value="diaria">Diária (todo dia útil)</option>
+          <option value="dias_semana">Dia(s) específico(s) da semana</option>
+          <option value="fim_de_mes">Todo final de mês</option>
+          <option value="dia_mes">Dia específico do mês</option>
+          <option value="indefinida">Sem lembrete automático (só referência no painel)</option>
+        </select>
+      </div>
+      <div class="mc-form-group" id="edit-dias-semana-wrap" style="display:none;">
+        <label>Dias da semana</label>
+        <div class="dias-semana-grid">
+          <label class="dia-check"><input type="checkbox" value="0" class="edit-dia-semana"> Seg</label>
+          <label class="dia-check"><input type="checkbox" value="1" class="edit-dia-semana"> Ter</label>
+          <label class="dia-check"><input type="checkbox" value="2" class="edit-dia-semana"> Qua</label>
+          <label class="dia-check"><input type="checkbox" value="3" class="edit-dia-semana"> Qui</label>
+          <label class="dia-check"><input type="checkbox" value="4" class="edit-dia-semana"> Sex</label>
+          <label class="dia-check"><input type="checkbox" value="5" class="edit-dia-semana"> Sáb</label>
+          <label class="dia-check"><input type="checkbox" value="6" class="edit-dia-semana"> Dom</label>
+        </div>
+      </div>
+      <div class="mc-form-group" id="edit-dia-mes-wrap" style="display:none;">
+        <label>Dia do mês (1-31)</label>
+        <input type="number" id="edit-dia-mes" min="1" max="31">
+      </div>
+      <div class="mc-form-group">
+        <div class="checkbox-row">
+          <input type="checkbox" id="edit-ativo">
+          <label for="edit-ativo" style="margin:0;text-transform:none;font-weight:600;color:var(--text);">Compromisso ativo (desmarque pra parar de gerar lembrete/pendência sem apagar o histórico)</label>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="row-btn" onclick="fecharEdicao()">Cancelar</button>
+      <button class="btn-cyan" onclick="salvarEdicao()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
 
 <script>
 const SUPABASE_URL = 'https://rpibvjcnrseuugpkfmdj.supabase.co';
@@ -319,7 +384,10 @@ function renderTabela(){
       <td>${esc(d.item||'')}</td>
       <td>${esc(d.etapa||'—')}</td>
       <td>${badge}</td>
-      <td>${classe !== 'entregue' ? `<button class="row-btn entregue-btn" onclick="marcarEntregue(${e.id})">✅ Entreguei</button>` : `<button class="row-btn" onclick="desmarcarEntregue(${e.id})">↩ Desfazer</button>`}</td>
+      <td style="white-space:nowrap;">
+        ${classe !== 'entregue' ? `<button class="row-btn entregue-btn" onclick="marcarEntregue(${e.id})">✅ Entreguei</button>` : `<button class="row-btn" onclick="desmarcarEntregue(${e.id})">↩ Desfazer</button>`}
+        <button class="row-btn" onclick="abrirEdicao(${d.id})" style="margin-left:6px;">⚙️ Editar regra</button>
+      </td>
     </tr>`;
   }).join('');
 }
@@ -367,6 +435,74 @@ async function desmarcarEntregue(id){
   }catch(err){
     console.error(err);
     toast('Não foi possível desfazer: ' + (err.message||err), true);
+  }
+}
+
+const DIA_SEMANA_LABEL = ['Segunda','Terça','Quarta','Quinta','Sexta','Sábado','Domingo'];
+let EDIT_DEFINICAO_ID = null;
+
+function abrirEdicao(definicaoId){
+  const entrega = ENTREGAS.find(e => e.compromissos_definicoes.id === definicaoId);
+  if(!entrega){ toast('Não encontrei os dados desse compromisso.', true); return; }
+  const d = entrega.compromissos_definicoes;
+  EDIT_DEFINICAO_ID = definicaoId;
+
+  const partesInfo = [`<strong>${esc(d.responsavel_nome)}</strong>`, esc(d.item||'')];
+  if(d.etapa) partesInfo.push(`(${esc(d.etapa)})`);
+  if(d.cliente) partesInfo.push('— ' + esc(d.cliente));
+  document.getElementById('edit-info').innerHTML = partesInfo.join(' ') +
+    (d.periodicidade_original ? `<br><span style="opacity:.75">Texto original da planilha: "${esc(d.periodicidade_original)}"</span>` : '');
+
+  document.getElementById('edit-regra-tipo').value = d.regra_tipo || 'indefinida';
+  document.querySelectorAll('.edit-dia-semana').forEach(cb => {
+    cb.checked = (d.regra_dias_semana || []).includes(Number(cb.value));
+  });
+  document.getElementById('edit-dia-mes').value = d.regra_dia_mes || '';
+  document.getElementById('edit-ativo').checked = d.ativo !== false;
+
+  atualizarCamposEdicao();
+  document.getElementById('modal-editar').classList.add('show');
+}
+
+function atualizarCamposEdicao(){
+  const tipo = document.getElementById('edit-regra-tipo').value;
+  document.getElementById('edit-dias-semana-wrap').style.display = tipo === 'dias_semana' ? 'block' : 'none';
+  document.getElementById('edit-dia-mes-wrap').style.display = tipo === 'dia_mes' ? 'block' : 'none';
+}
+
+function fecharEdicao(){
+  document.getElementById('modal-editar').classList.remove('show');
+  EDIT_DEFINICAO_ID = null;
+}
+
+async function salvarEdicao(){
+  if(!EDIT_DEFINICAO_ID) return;
+  const tipo = document.getElementById('edit-regra-tipo').value;
+  const patch = {
+    regra_tipo: tipo,
+    regra_dias_semana: null,
+    regra_dia_mes: null,
+    ativo: document.getElementById('edit-ativo').checked,
+  };
+  if(tipo === 'dias_semana'){
+    const dias = [...document.querySelectorAll('.edit-dia-semana:checked')].map(cb => Number(cb.value));
+    if(!dias.length){ toast('Selecione ao menos um dia da semana.', true); return; }
+    patch.regra_dias_semana = dias;
+  }
+  if(tipo === 'dia_mes'){
+    const dia = Number(document.getElementById('edit-dia-mes').value);
+    if(!dia || dia < 1 || dia > 31){ toast('Informe um dia do mês válido (1-31).', true); return; }
+    patch.regra_dia_mes = dia;
+  }
+  try{
+    const { error } = await sb.from('compromissos_definicoes').update(patch).eq('id', EDIT_DEFINICAO_ID);
+    if(error) throw error;
+    toast('Regra atualizada — vale a partir do próximo cálculo diário (ainda não afeta pendências já criadas).');
+    fecharEdicao();
+    carregar();
+  }catch(err){
+    console.error(err);
+    toast('Não foi possível salvar a edição: ' + (err.message||err), true);
   }
 }
 
