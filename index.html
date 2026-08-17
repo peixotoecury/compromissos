@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compromissos — Time B e Controladoria | LAWgico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+:root {
+  --azul-pc:  #00A9E0;
+  --cyan-lt:  rgba(0,169,224,.12);
+  --escuro-pc:#003B5C;
+  --preto-pc: #2D2926;
+  --bg:       #F4F9FC;
+  --surface:  #FFFFFF;
+  --surface2: #F7FCFF;
+  --border2:  #D8E7F0;
+  --text:     #2D2926;
+  --muted:    #5F7E92;
+  --muted2:   #7E98AA;
+  --red:      #C0392B;
+  --red-lt:   rgba(192,57,43,.10);
+  --orange:   #B85C00;
+  --orange-lt:rgba(230,126,34,.10);
+  --green:    #117A65;
+  --green-lt: rgba(17,122,101,.10);
+  --shadow-pc:0 8px 22px rgba(0,59,92,.08);
+  --font:     'Sora', sans-serif;
+  --mono:     'IBM Plex Mono', monospace;
+  --radius:   8px;
+  --radius-lg:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow-x:hidden;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(0,169,224,.25);border-radius:4px;}
+
+.topbar{background:linear-gradient(90deg,var(--escuro-pc),#00557B 72%,var(--azul-pc));border-bottom:4px solid var(--azul-pc);box-shadow:var(--shadow-pc);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:sticky;top:0;z-index:100;}
+.topbar-left{display:flex;align-items:center;gap:16px;}
+.tb-lawgico{display:inline-block;line-height:1;position:relative;}
+.tb-law{font-size:18px;font-weight:800;color:#fff;letter-spacing:-.5px;}
+.tb-gico{font-size:18px;font-weight:300;color:#fff;letter-spacing:-.5px;}
+.tb-modulo{font-size:9px;font-weight:300;color:rgba(255,255,255,.75);position:absolute;top:-11px;right:0;white-space:nowrap;}
+.tb-tagline{font-size:7.5px;font-weight:300;letter-spacing:3px;color:rgba(255,255,255,.65);margin-top:1px;}
+.topbar-divider{width:1px;height:28px;background:rgba(255,255,255,.25);}
+.topbar-title{font-size:13px;font-weight:600;color:rgba(255,255,255,.85);}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.hub-link{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600;text-decoration:none;font-family:'Sora',sans-serif;white-space:nowrap;}
+
+.main{max-width:1200px;margin:0 auto;padding:22px 24px 60px;}
+
+.filters-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);box-shadow:var(--shadow-pc);padding:18px 20px;margin-bottom:18px;display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;}
+.filter-group{display:flex;flex-direction:column;gap:4px;min-width:180px;}
+.filter-group label{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;}
+.filter-group select, .filter-group input{border:1px solid var(--border2);border-radius:var(--radius);padding:9px 12px;font-size:13px;font-family:var(--font);background:var(--surface2);color:var(--text);}
+.btn-cyan{background:var(--azul-pc);color:#fff;border:none;border-radius:var(--radius);padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);}
+.btn-cyan:hover{background:var(--escuro-pc);}
+.export-btn{background:none;border:1px solid var(--border2);border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;font-family:var(--font);margin-left:10px;}
+
+.resumo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:20px;}
+.resumo-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);box-shadow:var(--shadow-pc);padding:14px 16px;}
+.resumo-card .nome{font-size:13px;font-weight:700;color:var(--escuro-pc);margin-bottom:6px;}
+.resumo-card .contagem{display:flex;gap:10px;font-size:11px;}
+.resumo-card .contagem span{padding:2px 8px;border-radius:10px;font-weight:700;}
+.resumo-card .pendentes{background:var(--orange-lt);color:var(--orange);}
+.resumo-card .atrasados{background:var(--red-lt);color:var(--red);}
+.resumo-card .entregues{background:var(--green-lt);color:var(--green);}
+
+.dash-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);box-shadow:var(--shadow-pc);margin-bottom:18px;overflow:hidden;}
+.dash-card-head{background:var(--surface2);border-bottom:1px solid var(--border2);padding:14px 20px;font-size:14px;font-weight:700;color:var(--escuro-pc);display:flex;align-items:center;justify-content:space-between;}
+
+.table-wrap{overflow-x:auto;}
+table.comp-table{width:100%;border-collapse:collapse;}
+table.comp-table th{text-align:left;padding:10px 16px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);background:var(--surface2);border-bottom:1px solid var(--border2);white-space:nowrap;}
+table.comp-table td{padding:10px 16px;border-bottom:1px solid var(--border2);font-size:12.5px;vertical-align:middle;}
+table.comp-table tr:last-child td{border-bottom:none;}
+table.comp-table tr:hover td{background:var(--surface2);}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:10.5px;font-weight:700;white-space:nowrap;}
+.badge-pendente{background:var(--orange-lt);color:var(--orange);}
+.badge-atrasado{background:var(--red-lt);color:var(--red);}
+.badge-entregue{background:var(--green-lt);color:var(--green);}
+.row-btn{background:none;border:1px solid var(--border2);border-radius:6px;padding:5px 12px;font-size:11.5px;font-weight:700;color:var(--azul-pc);cursor:pointer;font-family:var(--font);white-space:nowrap;}
+.row-btn:hover{background:var(--cyan-lt);}
+.row-btn.entregue-btn{color:var(--green);border-color:var(--green-lt);}
+.row-btn.entregue-btn:hover{background:var(--green-lt);}
+.empty-state{text-align:center;padding:32px;color:var(--muted2);font-size:13px;}
+.mono{font-family:var(--mono);}
+
+.info-box{background:var(--cyan-lt);border:1px solid rgba(0,169,224,.25);border-radius:var(--radius);padding:10px 14px;font-size:12px;color:var(--escuro-pc);margin-bottom:14px;}
+
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--escuro-pc);color:#fff;padding:12px 22px;border-radius:8px;font-size:13px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:999;opacity:0;pointer-events:none;transition:opacity .2s, transform .2s;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(-6px);}
+#toast.error{background:var(--red);}
+
+@media(max-width:768px){
+  .main{padding:14px 12px 40px;}
+  .filters-card{flex-direction:column;align-items:stretch;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="tb-lawgico"><span class="tb-law">LAW</span><span class="tb-gico">gico</span><span class="tb-modulo">compromissos</span></div>
+    <div class="topbar-divider"></div>
+    <div class="topbar-title">Compromissos — Time B e Controladoria</div>
+  </div>
+  <div class="topbar-right">
+    <a class="hub-link" href="manual.html" target="_blank">📖 Manual</a>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="info-box" id="erro-conexao"></div>
+
+  <div class="filters-card">
+    <div class="filter-group">
+      <label>Pessoa</label>
+      <select id="f-pessoa" onchange="renderTudo()">
+        <option value="">Todos (visão coordenadora)</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Status</label>
+      <select id="f-status" onchange="renderTudo()">
+        <option value="">Todos</option>
+        <option value="pendente" selected>Pendentes + Atrasados</option>
+        <option value="atrasado">Só atrasados</option>
+        <option value="entregue">Entregues</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>De</label>
+      <input type="date" id="f-data-de" onchange="renderTudo()">
+    </div>
+    <div class="filter-group">
+      <label>Até</label>
+      <input type="date" id="f-data-ate" onchange="renderTudo()">
+    </div>
+    <div class="filter-group" style="min-width:220px;">
+      <label>Buscar</label>
+      <input type="text" id="f-busca" placeholder="Cliente, item, responsável…" oninput="renderTudo()">
+    </div>
+    <button class="btn-cyan" onclick="limparFiltros()">✕ Limpar filtros</button>
+  </div>
+
+  <div id="resumo-wrap" class="resumo-grid"></div>
+
+  <div class="dash-card">
+    <div class="dash-card-head">
+      <span>📋 Compromissos <span id="contagem-titulo"></span></span>
+      <button class="export-btn" onclick="exportarExcel()">⬇ Exportar Excel</button>
+    </div>
+    <div class="table-wrap">
+      <table class="comp-table">
+        <thead>
+          <tr><th>Data</th><th>Responsável</th><th>Grupo/Cliente</th><th>Item</th><th>Etapa</th><th>Status</th><th>Ações</th></tr>
+        </thead>
+        <tbody id="tbody-principal"><tr><td colspan="7" class="empty-state">Carregando…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+const SUPABASE_URL = 'https://rpibvjcnrseuugpkfmdj.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwaWJ2amNucnNldXVncGtmbWRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1NTc3MTcsImV4cCI6MjA5NzEzMzcxN30.ecihol8JESMH7cgFSvWKIzp-OwoPRFqdK3aCDwpCeg8';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+function esc(s){ return (s==null?'':String(s)).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function fmtData(d){ if(!d) return '—'; const [y,m,day] = d.split('-'); return `${day}/${m}/${y}`; }
+function hojeStr(){ const d = new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+
+function toast(msg, isError){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = isError ? 'show error' : 'show';
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => t.classList.remove('show'), 4000);
+}
+
+let ENTREGAS = [];
+
+async function carregar(){
+  try{
+    const { data, error } = await sb
+      .from('compromissos_entregas')
+      .select('*, compromissos_definicoes(*)')
+      .order('data', { ascending: false })
+      .limit(2000);
+    if(error) throw error;
+    ENTREGAS = (data || []).filter(e => e.compromissos_definicoes); // ignora orfãos (definição desativada e removida)
+    document.getElementById('erro-conexao').innerHTML = '';
+    popularSelectPessoas();
+    renderTudo();
+  }catch(err){
+    console.error(err);
+    document.getElementById('erro-conexao').innerHTML =
+      `<strong>Não foi possível carregar os compromissos.</strong> A tabela pode ainda não existir, ou o script diário ainda não rodou hoje. (${esc(err.message||err)})`;
+    document.getElementById('tbody-principal').innerHTML = '<tr><td colspan="7" class="empty-state">Nenhum dado carregado.</td></tr>';
+  }
+}
+
+function popularSelectPessoas(){
+  const sel = document.getElementById('f-pessoa');
+  const atual = sel.value;
+  const nomes = [...new Set(ENTREGAS.map(e => e.compromissos_definicoes.responsavel_nome).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+  sel.innerHTML = '<option value="">Todos (visão coordenadora)</option>' + nomes.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join('');
+  sel.value = atual;
+}
+
+function classificar(e){
+  if(e.status === 'entregue') return 'entregue';
+  return e.data < hojeStr() ? 'atrasado' : 'pendente';
+}
+
+function filtrarEntregas(){
+  const pessoa = document.getElementById('f-pessoa').value;
+  const status = document.getElementById('f-status').value;
+  const de = document.getElementById('f-data-de').value;
+  const ate = document.getElementById('f-data-ate').value;
+  const busca = document.getElementById('f-busca').value.toLowerCase();
+
+  return ENTREGAS.filter(e => {
+    const d = e.compromissos_definicoes;
+    const classe = classificar(e);
+    if(pessoa && d.responsavel_nome !== pessoa) return false;
+    if(status === 'pendente' && classe === 'entregue') return false;
+    if(status === 'atrasado' && classe !== 'atrasado') return false;
+    if(status === 'entregue' && classe !== 'entregue') return false;
+    if(de && e.data < de) return false;
+    if(ate && e.data > ate) return false;
+    if(busca){
+      const alvo = `${d.cliente||''} ${d.item||''} ${d.responsavel_nome||''} ${d.etapa||''}`.toLowerCase();
+      if(!alvo.includes(busca)) return false;
+    }
+    return true;
+  }).sort((a,b) => a.data.localeCompare(b.data) || (a.compromissos_definicoes.responsavel_nome||'').localeCompare(b.compromissos_definicoes.responsavel_nome||'', 'pt-BR'));
+}
+
+function renderResumo(){
+  const porPessoa = {};
+  for(const e of ENTREGAS){
+    const nome = e.compromissos_definicoes.responsavel_nome || '—';
+    porPessoa[nome] = porPessoa[nome] || { pendente:0, atrasado:0, entregue:0 };
+    porPessoa[nome][classificar(e)]++;
+  }
+  const wrap = document.getElementById('resumo-wrap');
+  const nomes = Object.keys(porPessoa).sort((a,b)=>a.localeCompare(b,'pt-BR'));
+  if(!nomes.length){ wrap.innerHTML = ''; return; }
+  wrap.innerHTML = nomes.map(nome => {
+    const c = porPessoa[nome];
+    return `<div class="resumo-card">
+      <div class="nome">${esc(nome)}</div>
+      <div class="contagem">
+        <span class="atrasados">${c.atrasado} atrasado${c.atrasado!==1?'s':''}</span>
+        <span class="pendentes">${c.pendente} pendente${c.pendente!==1?'s':''}</span>
+        <span class="entregues">${c.entregue} entregue${c.entregue!==1?'s':''}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderTabela(){
+  const filtradas = filtrarEntregas();
+  window._FILTRADAS = filtradas;
+  document.getElementById('contagem-titulo').textContent = `(${filtradas.length})`;
+  const tbody = document.getElementById('tbody-principal');
+  if(!filtradas.length){ tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Nenhum compromisso encontrado com esses filtros.</td></tr>'; return; }
+  tbody.innerHTML = filtradas.map(e => {
+    const d = e.compromissos_definicoes;
+    const classe = classificar(e);
+    const badge = classe === 'entregue' ? '<span class="badge badge-entregue">✔ Entregue</span>'
+                : classe === 'atrasado' ? '<span class="badge badge-atrasado">⚠ Atrasado</span>'
+                : '<span class="badge badge-pendente">Pendente</span>';
+    return `<tr>
+      <td class="mono">${fmtData(e.data)}</td>
+      <td>${esc(d.responsavel_nome)}</td>
+      <td>${esc(d.grupo||'')}${d.cliente ? ' · ' + esc(d.cliente) : ''}</td>
+      <td>${esc(d.item||'')}</td>
+      <td>${esc(d.etapa||'—')}</td>
+      <td>${badge}</td>
+      <td>${classe !== 'entregue' ? `<button class="row-btn entregue-btn" onclick="marcarEntregue(${e.id})">✅ Entreguei</button>` : `<button class="row-btn" onclick="desmarcarEntregue(${e.id})">↩ Desfazer</button>`}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderTudo(){
+  renderResumo();
+  renderTabela();
+}
+
+function limparFiltros(){
+  document.getElementById('f-pessoa').value = '';
+  document.getElementById('f-status').value = 'pendente';
+  document.getElementById('f-data-de').value = '';
+  document.getElementById('f-data-ate').value = '';
+  document.getElementById('f-busca').value = '';
+  renderTudo();
+}
+
+async function marcarEntregue(id){
+  try{
+    const { error } = await sb.from('compromissos_entregas')
+      .update({ status: 'entregue', entregue_em: new Date().toISOString() })
+      .eq('id', id);
+    if(error) throw error;
+    const e = ENTREGAS.find(x => x.id === id);
+    if(e){ e.status = 'entregue'; e.entregue_em = new Date().toISOString(); }
+    toast('Marcado como entregue.');
+    renderTudo();
+  }catch(err){
+    console.error(err);
+    toast('Não foi possível marcar como entregue: ' + (err.message||err), true);
+  }
+}
+
+async function desmarcarEntregue(id){
+  try{
+    const { error } = await sb.from('compromissos_entregas')
+      .update({ status: 'pendente', entregue_em: null })
+      .eq('id', id);
+    if(error) throw error;
+    const e = ENTREGAS.find(x => x.id === id);
+    if(e){ e.status = 'pendente'; e.entregue_em = null; }
+    toast('Desfeito — voltou pra pendente.');
+    renderTudo();
+  }catch(err){
+    console.error(err);
+    toast('Não foi possível desfazer: ' + (err.message||err), true);
+  }
+}
+
+function exportarExcel(){
+  const linhas = (window._FILTRADAS||[]).map(e => {
+    const d = e.compromissos_definicoes;
+    return {
+      Data: fmtData(e.data), Responsável: d.responsavel_nome, Grupo: d.grupo, Cliente: d.cliente,
+      Item: d.item, Etapa: d.etapa||'', Status: classificar(e), 'Entregue em': e.entregue_em||'',
+    };
+  });
+  if(!linhas.length){ toast('Nada pra exportar com esses filtros.', true); return; }
+  const ws = XLSX.utils.json_to_sheet(linhas);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Compromissos');
+  XLSX.writeFile(wb, `Compromissos_${hojeStr()}.xlsx`);
+}
+
+// Deep-link opcional: ?pessoa=Nome%20Completo (usado no link do e-mail diário)
+(function(){
+  const params = new URLSearchParams(window.location.search);
+  const pessoa = params.get('pessoa');
+  if(pessoa) window._pessoaDeepLink = pessoa;
+})();
+
+carregar().then(() => {
+  if(window._pessoaDeepLink){
+    document.getElementById('f-pessoa').value = window._pessoaDeepLink;
+    renderTudo();
+  }
+});
+
+// Realtime: qualquer mudança na tabela recarrega (outra pessoa marcando entregue, por exemplo)
+sb.channel('compromissos-realtime')
+  .on('postgres_changes', { event: '*', schema: 'public', table: 'compromissos_entregas' }, () => carregar())
+  .subscribe();
+</script>
+
+</body>
+</html>
