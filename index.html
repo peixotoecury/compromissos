@@ -40,7 +40,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:13
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:rgba(0,169,224,.25);border-radius:4px;}
 
-.topbar{background:linear-gradient(90deg,var(--escuro-pc),#00557B 72%,var(--azul-pc));border-bottom:4px solid var(--azul-pc);box-shadow:var(--shadow-pc);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:sticky;top:0;z-index:100;}
+.topbar{background:linear-gradient(90deg,var(--escuro-pc),#00557B 72%,var(--azul-pc));border-bottom:4px solid var(--azul-pc);box-shadow:0 4px 18px rgba(0,59,92,.22);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:sticky;top:0;z-index:100;}
 .topbar-left{display:flex;align-items:center;gap:16px;}
 .tb-lawgico{display:inline-block;line-height:1;position:relative;}
 .tb-law{font-size:18px;font-weight:800;color:#fff;letter-spacing:-.5px;}
@@ -53,27 +53,35 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:13
 .hub-link{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600;text-decoration:none;font-family:'Sora',sans-serif;white-space:nowrap;}
 
 .tab-bar{background:var(--surface);border-bottom:1px solid var(--border2);padding:0 24px;display:flex;gap:4px;box-shadow:0 2px 10px rgba(0,59,92,.05);overflow-x:auto;}
-.tab-btn{background:none;border:none;padding:14px 18px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;font-family:var(--font);border-bottom:3px solid transparent;transition:all .15s;white-space:nowrap;}
+.tab-btn{background:none;border:none;padding:15px 18px;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;font-family:var(--font);border-bottom:3px solid transparent;transition:color .15s,border-color .15s;white-space:nowrap;}
 .tab-btn:hover{color:var(--escuro-pc);}
 .tab-btn.active{color:var(--escuro-pc);border-bottom-color:var(--azul-pc);}
 
-.main{max-width:1200px;margin:0 auto;padding:22px 24px 60px;}
+.main{max-width:1200px;margin:0 auto;padding:24px 24px 60px;}
 
-.filters-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);box-shadow:var(--shadow-pc);padding:18px 20px;margin-bottom:18px;display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;}
-.filter-group{display:flex;flex-direction:column;gap:4px;min-width:180px;}
-.filter-group label{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;}
-.filter-group select, .filter-group input{border:1px solid var(--border2);border-radius:var(--radius);padding:9px 12px;font-size:13px;font-family:var(--font);background:var(--surface2);color:var(--text);}
-.btn-cyan{background:var(--azul-pc);color:#fff;border:none;border-radius:var(--radius);padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);}
+.filters-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);box-shadow:var(--shadow-pc);padding:20px 22px;margin-bottom:20px;display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;position:relative;overflow:hidden;}
+.filters-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--azul-pc),var(--escuro-pc));}
+.filter-group{display:flex;flex-direction:column;gap:5px;min-width:180px;}
+.filter-group label{font-size:10.5px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+.filter-group select, .filter-group input{border:1px solid var(--border2);border-radius:var(--radius);padding:9px 12px;font-size:13px;font-family:var(--font);background:var(--surface2);color:var(--text);transition:border-color .15s,box-shadow .15s;}
+.filter-group select:focus, .filter-group input:focus{outline:none;border-color:var(--azul-pc);box-shadow:0 0 0 3px rgba(0,169,224,.14);}
+.btn-cyan{background:var(--azul-pc);color:#fff;border:none;border-radius:var(--radius);padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);transition:background .15s,transform .1s;}
 .btn-cyan:hover{background:var(--escuro-pc);}
-.export-btn{background:none;border:1px solid var(--border2);border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;font-family:var(--font);margin-left:10px;}
+.btn-cyan:active{transform:scale(.97);}
+.btn-cyan.btn-green{background:var(--green);}
+.btn-cyan.btn-green:hover{background:#0d5f52;}
+.export-btn{background:var(--surface2);border:1px solid var(--border2);border-radius:20px;padding:6px 14px;font-size:11px;font-weight:700;color:var(--escuro-pc);cursor:pointer;font-family:var(--font);margin-left:10px;transition:background .15s,border-color .15s;}
+.export-btn:hover{background:var(--cyan-lt);border-color:var(--azul-pc);}
 
-.resumo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:20px;}
-.resumo-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);box-shadow:var(--shadow-pc);padding:14px 16px;}
-.resumo-card .nome{font-size:13px;font-weight:700;color:var(--escuro-pc);margin-bottom:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.resumo-card .contagem{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
-.resumo-card .stat{text-align:center;border-radius:8px;padding:7px 4px 6px;}
-.resumo-card .stat .num{display:block;font-size:17px;font-weight:800;line-height:1.15;}
-.resumo-card .stat .lbl{display:block;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.2px;margin-top:2px;white-space:nowrap;}
+.resumo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;margin-bottom:22px;}
+.resumo-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);box-shadow:var(--shadow-pc);padding:16px 18px;position:relative;overflow:hidden;transition:transform .12s,box-shadow .12s;}
+.resumo-card:hover{transform:translateY(-2px);box-shadow:0 12px 26px rgba(0,59,92,.14);}
+.resumo-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:var(--rc,linear-gradient(90deg,var(--azul-pc),var(--escuro-pc)));}
+.resumo-card .nome{font-size:13.5px;font-weight:800;color:var(--escuro-pc);margin-bottom:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.resumo-card .contagem{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;}
+.resumo-card .stat{text-align:center;border-radius:9px;padding:8px 4px 7px;}
+.resumo-card .stat .num{display:block;font-size:18px;font-weight:800;line-height:1.15;font-family:var(--mono);}
+.resumo-card .stat .lbl{display:block;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.2px;margin-top:3px;white-space:nowrap;}
 .resumo-card .stat.atrasados{background:var(--red-lt);}
 .resumo-card .stat.atrasados .num, .resumo-card .stat.atrasados .lbl{color:var(--red);}
 .resumo-card .stat.pendentes{background:var(--orange-lt);}
@@ -82,23 +90,23 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:13
 .resumo-card .stat.entregues .num, .resumo-card .stat.entregues .lbl{color:var(--green);}
 
 .dash-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);box-shadow:var(--shadow-pc);margin-bottom:18px;overflow:hidden;}
-.dash-card-head{background:var(--surface2);border-bottom:1px solid var(--border2);padding:14px 20px;font-size:14px;font-weight:700;color:var(--escuro-pc);display:flex;align-items:center;justify-content:space-between;}
+.dash-card-head{background:var(--surface2);border-bottom:1px solid var(--border2);padding:15px 22px;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:var(--escuro-pc);display:flex;align-items:center;justify-content:space-between;}
 
 .table-wrap{overflow-x:auto;}
-table.comp-table{width:100%;border-collapse:collapse;}
-table.comp-table th{text-align:left;padding:10px 16px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);background:var(--surface2);border-bottom:1px solid var(--border2);white-space:nowrap;}
-table.comp-table td{padding:10px 16px;border-bottom:1px solid var(--border2);font-size:12.5px;vertical-align:middle;}
+table.comp-table{width:100%;border-collapse:collapse;min-width:820px;}
+table.comp-table th{text-align:left;padding:11px 18px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#fff;background:var(--escuro-pc);white-space:nowrap;position:sticky;top:0;}
+table.comp-table td{padding:11px 18px;border-bottom:1px solid var(--border2);font-size:12.5px;vertical-align:middle;}
 table.comp-table tr:last-child td{border-bottom:none;}
 table.comp-table tr:hover td{background:var(--surface2);}
-.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:10.5px;font-weight:700;white-space:nowrap;}
-.badge-pendente{background:var(--orange-lt);color:var(--orange);}
-.badge-atrasado{background:var(--red-lt);color:var(--red);}
-.badge-entregue{background:var(--green-lt);color:var(--green);}
-.row-btn{background:none;border:1px solid var(--border2);border-radius:6px;padding:5px 12px;font-size:11.5px;font-weight:700;color:var(--azul-pc);cursor:pointer;font-family:var(--font);white-space:nowrap;}
-.row-btn:hover{background:var(--cyan-lt);}
-.row-btn.entregue-btn{color:var(--green);border-color:var(--green-lt);}
-.row-btn.entregue-btn:hover{background:var(--green-lt);}
-.empty-state{text-align:center;padding:32px;color:var(--muted2);font-size:13px;}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 11px;border-radius:20px;font-size:10.5px;font-weight:700;white-space:nowrap;border:1px solid transparent;}
+.badge-pendente{background:var(--orange-lt);color:var(--orange);border-color:rgba(230,126,34,.25);}
+.badge-atrasado{background:var(--red-lt);color:var(--red);border-color:rgba(192,57,43,.25);}
+.badge-entregue{background:var(--green-lt);color:var(--green);border-color:rgba(17,122,101,.25);}
+.row-btn{background:#fff;border:1px solid var(--border2);border-radius:7px;padding:6px 13px;font-size:11.5px;font-weight:700;color:var(--azul-pc);cursor:pointer;font-family:var(--font);white-space:nowrap;transition:background .15s,border-color .15s;}
+.row-btn:hover{background:var(--cyan-lt);border-color:var(--azul-pc);}
+.row-btn.entregue-btn{color:var(--green);border-color:rgba(17,122,101,.25);}
+.row-btn.entregue-btn:hover{background:var(--green-lt);border-color:var(--green);}
+.empty-state{text-align:center;padding:36px;color:var(--muted2);font-size:13px;}
 .mono{font-family:var(--mono);}
 
 .info-box{background:var(--cyan-lt);border:1px solid rgba(0,169,224,.25);border-radius:var(--radius);padding:10px 14px;font-size:12px;color:var(--escuro-pc);margin-bottom:14px;}
@@ -128,9 +136,181 @@ table.comp-table tr:hover td{background:var(--surface2);}
   .main{padding:14px 12px 40px;}
   .filters-card{flex-direction:column;align-items:stretch;}
 }
+
+/* ── GATE DE SENHA + IDENTIFICAÇÃO (padrão split-screen LAWgico) ─────────── */
+#pwGate{position:fixed;inset:0;z-index:9999;background:#0B1E2D;overflow:auto;}
+html.gate-open #pwGate{display:none;}
+.lp-wrap{display:flex;width:100%;min-height:100%;}
+.lp-left{
+  flex:0 0 46%;background:linear-gradient(165deg,#0D2A45 0%,#0a1e30 55%,#071828 100%);
+  display:flex;flex-direction:column;justify-content:center;padding:60px 56px;position:relative;overflow:hidden;
+}
+.lp-left::before{content:'';position:absolute;right:-80px;bottom:-80px;width:320px;height:320px;border-radius:50%;
+  background:radial-gradient(circle,rgba(0,174,239,.06) 0%,transparent 70%);pointer-events:none;}
+.lp-lawgico{margin-bottom:28px;}
+.lp-logo-name{font-family:'Sora',sans-serif;line-height:1;display:inline-block;position:relative;}
+.lp-logo-name .lp-law{font-size:36px;font-weight:800;color:#fff;letter-spacing:-1px;}
+.lp-logo-name .lp-gico{font-size:36px;font-weight:300;color:#fff;letter-spacing:-1px;}
+.lp-tag{font-family:'Sora',sans-serif;font-size:10px;font-weight:300;color:#fff;letter-spacing:.4px;position:absolute;top:-6px;right:0;}
+.lp-tagline{font-size:10px;font-weight:300;letter-spacing:3.5px;color:rgba(255,255,255,.85);margin-top:4px;font-family:'Sora',sans-serif;}
+.lp-welcome{display:flex;align-items:center;gap:14px;margin-bottom:10px;}
+.lp-welcome-icon{width:38px;height:38px;border:1.5px solid rgba(0,174,239,.4);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.lp-welcome-icon svg{width:20px;height:20px;stroke:#00AEEF;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.lp-welcome-text h2{font-size:15px;font-weight:700;color:#fff;margin:0 0 2px;font-family:'Sora',sans-serif;}
+.lp-welcome-text p{font-size:12px;color:rgba(255,255,255,.6);margin:0;font-family:'Sora',sans-serif;}
+.lp-welcome-divider{height:1px;background:rgba(255,255,255,.15);border:none;margin:18px 0;}
+.lp-features{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:0;}
+.lp-features li{display:flex;align-items:flex-start;gap:16px;padding:18px 0;border-bottom:1px solid rgba(255,255,255,.06);}
+.lp-features li:first-child{padding-top:0;}
+.lp-features li:last-child{border-bottom:none;padding-bottom:0;}
+.lp-feat-icon{width:40px;height:40px;border-radius:10px;flex-shrink:0;background:rgba(0,174,239,.10);border:1px solid rgba(0,174,239,.18);display:flex;align-items:center;justify-content:center;}
+.lp-feat-icon svg{width:20px;height:20px;stroke:#00AEEF;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+.lp-feat-text{flex:1;padding-top:2px;}
+.lp-feat-title{font-size:13px;font-weight:600;color:#fff;margin-bottom:3px;font-family:'Sora',sans-serif;}
+.lp-feat-desc{font-size:11.5px;color:rgba(255,255,255,.4);line-height:1.55;font-family:'Sora',sans-serif;}
+.lp-right{flex:1;background:#fff;display:flex;align-items:center;justify-content:center;padding:60px 56px;}
+.lp-form-inner{width:100%;max-width:360px;}
+.lp-title{font-size:28px;font-weight:700;color:#0B1E2D;margin-bottom:6px;font-family:'Sora',sans-serif;}
+.lp-sub{font-size:13px;color:#8399ae;margin-bottom:32px;font-family:'Sora',sans-serif;}
+.lp-field-label{font-size:10.5px;font-weight:700;color:#00AEEF;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:7px;font-family:'Sora',sans-serif;}
+.lp-input-wrap{position:relative;margin-bottom:18px;}
+.lp-input-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);pointer-events:none;}
+.lp-input-icon svg{width:16px;height:16px;stroke:#8399ae;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.lp-input-wrap input{width:100%;padding:12px 14px 12px 42px;background:#f7fafc;border:1.5px solid #dde8f0;border-radius:10px;
+  font-size:13.5px;color:#0B1E2D;font-family:'Sora',sans-serif;outline:none;transition:border .2s,box-shadow .2s;box-sizing:border-box;}
+.lp-input-wrap input:focus{border-color:#00AEEF;background:#fff;box-shadow:0 0 0 3px rgba(0,174,239,.08);}
+.lp-input-wrap input::placeholder{color:#b0bfcc;}
+.lp-eye-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:4px;color:#8399ae;}
+.lp-eye-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+.lp-submit-btn{width:100%;padding:13px;background:linear-gradient(135deg,#0B1E2D 0%,#1a3a5c 100%);border:none;border-radius:10px;
+  color:#fff;font-size:14.5px;font-weight:600;font-family:'Sora',sans-serif;letter-spacing:.3px;cursor:pointer;transition:all .2s;
+  display:flex;align-items:center;justify-content:center;gap:10px;margin-top:6px;}
+.lp-submit-btn:hover{background:linear-gradient(135deg,#0d2540 0%,#1f4770 100%);box-shadow:0 4px 18px rgba(11,30,45,.3);transform:translateY(-1px);}
+.lp-submit-btn svg{width:18px;height:18px;stroke:#00AEEF;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.lp-err{color:#d94444;font-size:12px;text-align:center;min-height:16px;margin-top:10px;display:none;font-family:'Sora',sans-serif;}
+.lp-err.show{display:block;}
+.lp-restricted{text-align:center;margin-top:18px;}
+.lp-restricted span{font-size:12px;color:#8399ae;font-family:'Sora',sans-serif;}
+@media(max-width:768px){
+  .lp-wrap{flex-direction:column;}
+  .lp-left{flex:none;padding:36px 28px;}
+  .lp-features{display:none;}
+  .lp-right{padding:40px 28px;}
+}
 </style>
+<script>
+try{
+  if(localStorage.getItem('voeGateOk')==='1' && localStorage.getItem('compromissosEmail')){
+    document.documentElement.classList.add('gate-open');
+  }
+}catch(e){}
+</script>
 </head>
 <body>
+
+<div id="pwGate">
+<div class="lp-wrap">
+  <!-- PAINEL ESQUERDO -->
+  <div class="lp-left">
+    <div class="lp-lawgico">
+      <div class="lp-logo-name"><span class="lp-law">LAW</span><span class="lp-gico">gico</span><span class="lp-tag">compromissos</span></div>
+      <div class="lp-tagline">lawyers at work</div>
+    </div>
+    <div class="lp-welcome">
+      <div class="lp-welcome-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+      <div class="lp-welcome-text"><h2>Bem-vindo</h2><p>Peixoto &amp; Cury Advogados</p></div>
+    </div>
+    <hr class="lp-welcome-divider">
+    <ul class="lp-features">
+      <li>
+        <div class="lp-feat-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+        <div class="lp-feat-text"><div class="lp-feat-title">Seus compromissos do dia</div><div class="lp-feat-desc">Veja na hora o que vence hoje e o que está atrasado.</div></div>
+      </li>
+      <li>
+        <div class="lp-feat-icon"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg></div>
+        <div class="lp-feat-text"><div class="lp-feat-title">Marque como entregue</div><div class="lp-feat-desc">Um clique e o compromisso some da sua lista de pendências.</div></div>
+      </li>
+      <li>
+        <div class="lp-feat-icon"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+        <div class="lp-feat-text"><div class="lp-feat-title">Alertas automáticos</div><div class="lp-feat-desc">E-mail no horário certo do dia, sem precisar lembrar.</div></div>
+      </li>
+      <li>
+        <div class="lp-feat-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <div class="lp-feat-text"><div class="lp-feat-title">Visão geral pra coordenação</div><div class="lp-feat-desc">Sócios e coordenadores acompanham o time todo, não só o próprio.</div></div>
+      </li>
+    </ul>
+  </div>
+  <!-- PAINEL DIREITO -->
+  <div class="lp-right">
+    <div class="lp-form-inner">
+      <div class="lp-title">Fazer login</div>
+      <div class="lp-sub">Acesse sua conta LAWgico Compromissos</div>
+
+      <div class="lp-field-label">SEU NOME</div>
+      <div class="lp-input-wrap">
+        <span class="lp-input-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+        <input type="text" id="gateNome" placeholder="Ex.: Ana Carolina" autocomplete="name">
+      </div>
+
+      <div class="lp-field-label">E-MAIL</div>
+      <div class="lp-input-wrap">
+        <span class="lp-input-icon"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z" style="display:none"/><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg></span>
+        <input type="email" id="gateEmail" placeholder="seu.email@peixotoecury.com.br" autocomplete="username">
+      </div>
+
+      <div class="lp-field-label">SENHA</div>
+      <div class="lp-input-wrap">
+        <span class="lp-input-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+        <input type="password" id="gatePass" placeholder="Senha de acesso" style="padding-right:44px;" autocomplete="current-password">
+        <button type="button" class="lp-eye-btn" id="gateEyeBtn" aria-label="Mostrar senha">
+          <svg viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M9.88 5.72A8.8 8.8 0 0 1 12 5.25c6 0 9.75 6.75 9.75 6.75a17.9 17.9 0 0 1-3.1 3.86"/><path d="M14.12 18.28A8.8 8.8 0 0 1 12 18.75C6 18.75 2.25 12 2.25 12a17.9 17.9 0 0 1 3.1-3.86"/></svg>
+        </button>
+      </div>
+
+      <button class="lp-submit-btn" id="gateBtn" type="button">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Entrar
+      </button>
+      <div class="lp-err" id="gateErr">Preencha nome, e-mail e a senha correta.</div>
+      <div class="lp-restricted"><span>Acesso restrito — Peixoto &amp; Cury Advogados</span></div>
+    </div>
+  </div>
+</div>
+</div>
+<script>
+(function(){
+  var HASH='e839fc779b442d5393727d7af62bb94e3d892e44906d0f7d603702d01215f0c1';
+  async function sha256(msg){
+    var buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(msg));
+    return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
+  }
+  async function tentar(){
+    var nome=document.getElementById('gateNome').value.trim();
+    var email=document.getElementById('gateEmail').value.trim().toLowerCase();
+    var pass=document.getElementById('gatePass').value;
+    var h=await sha256(pass);
+    if(h===HASH && nome && email.includes('@')){
+      try{
+        localStorage.setItem('voeGateOk','1');
+        localStorage.setItem('compromissosEmail', email);
+        localStorage.setItem('compromissosNome', nome);
+      }catch(e){}
+      document.documentElement.classList.add('gate-open');
+      if(window.aposLogin) window.aposLogin();
+    }else{
+      document.getElementById('gateErr').classList.add('show');
+    }
+  }
+  document.getElementById('gateBtn').addEventListener('click',tentar);
+  ['gateNome','gateEmail','gatePass'].forEach(function(id){
+    document.getElementById(id).addEventListener('keydown',function(ev){ if(ev.key==='Enter'){tentar();} });
+  });
+  document.getElementById('gateEyeBtn').addEventListener('click',function(){
+    var inp=document.getElementById('gatePass');
+    inp.type = inp.type==='password' ? 'text' : 'password';
+  });
+})();
+</script>
 
 <div class="topbar">
   <div class="topbar-left">
@@ -182,7 +362,9 @@ table.comp-table tr:hover td{background:var(--surface2);}
       <input type="text" id="f-busca" placeholder="Cliente, item, responsável…" oninput="renderTudo()">
     </div>
     <button class="btn-cyan" onclick="limparFiltros()">✕ Limpar filtros</button>
+    <button class="btn-cyan btn-green" id="btn-novo" onclick="abrirNovo()">+ Novo compromisso</button>
   </div>
+  <div class="info-box" id="minha-visao-info" style="display:none;"></div>
 
   <div id="resumo-wrap" class="resumo-grid"></div>
 
@@ -253,6 +435,75 @@ table.comp-table tr:hover td{background:var(--surface2);}
   </div>
 </div>
 
+<div class="modal-overlay" id="modal-novo">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>➕ Novo compromisso</h3>
+      <button class="modal-close" onclick="fecharNovo()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="mc-form-group" id="novo-responsavel-wrap">
+        <label>Responsável</label>
+        <input type="text" id="novo-nome" placeholder="Nome">
+      </div>
+      <div class="mc-form-group" id="novo-email-wrap">
+        <label>E-mail do responsável</label>
+        <input type="email" id="novo-email" placeholder="nome@peixotoecury.com.br">
+      </div>
+      <div class="mc-form-group">
+        <label>Grupo</label>
+        <input type="text" id="novo-grupo" placeholder="Ex: B1, B2, Controladoria...">
+      </div>
+      <div class="mc-form-group">
+        <label>Cliente</label>
+        <input type="text" id="novo-cliente" placeholder="Ex: Bridgestone, Embraer...">
+      </div>
+      <div class="mc-form-group">
+        <label>Item / atividade</label>
+        <input type="text" id="novo-item" placeholder="O que precisa ser feito">
+      </div>
+      <div class="mc-form-group">
+        <label>Etapa (opcional)</label>
+        <input type="text" id="novo-etapa" placeholder="Ex: Corte, Revisão, Envio ao cliente...">
+      </div>
+      <div class="mc-form-group">
+        <label>Tipo</label>
+        <select id="novo-tipo" onchange="atualizarCamposNovo()">
+          <option value="pontual">Pontual — uma data específica</option>
+          <option value="diaria">Recorrente — todo dia útil</option>
+          <option value="dias_semana">Recorrente — dia(s) específico(s) da semana</option>
+          <option value="fim_de_mes">Recorrente — todo final de mês</option>
+          <option value="dia_mes">Recorrente — dia específico do mês</option>
+        </select>
+      </div>
+      <div class="mc-form-group" id="novo-data-wrap">
+        <label>Data</label>
+        <input type="date" id="novo-data">
+      </div>
+      <div class="mc-form-group" id="novo-dias-semana-wrap" style="display:none;">
+        <label>Dias da semana</label>
+        <div class="dias-semana-grid">
+          <label class="dia-check"><input type="checkbox" value="0" class="novo-dia-semana"> Seg</label>
+          <label class="dia-check"><input type="checkbox" value="1" class="novo-dia-semana"> Ter</label>
+          <label class="dia-check"><input type="checkbox" value="2" class="novo-dia-semana"> Qua</label>
+          <label class="dia-check"><input type="checkbox" value="3" class="novo-dia-semana"> Qui</label>
+          <label class="dia-check"><input type="checkbox" value="4" class="novo-dia-semana"> Sex</label>
+          <label class="dia-check"><input type="checkbox" value="5" class="novo-dia-semana"> Sáb</label>
+          <label class="dia-check"><input type="checkbox" value="6" class="novo-dia-semana"> Dom</label>
+        </div>
+      </div>
+      <div class="mc-form-group" id="novo-dia-mes-wrap" style="display:none;">
+        <label>Dia do mês (1-31)</label>
+        <input type="number" id="novo-dia-mes" min="1" max="31">
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="row-btn" onclick="fecharNovo()">Cancelar</button>
+      <button class="btn-cyan btn-green" onclick="salvarNovo()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const SUPABASE_URL = 'https://rpibvjcnrseuugpkfmdj.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwaWJ2amNucnNldXVncGtmbWRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1NTc3MTcsImV4cCI6MjA5NzEzMzcxN30.ecihol8JESMH7cgFSvWKIzp-OwoPRFqdK3aCDwpCeg8';
@@ -273,6 +524,40 @@ function toast(msg, isError){
 let ENTREGAS = [];
 let ABA_ATIVA = 'geral';
 
+// ── Identificação / escopo de visão ──────────────────────────────────────
+const VISAO_GERAL_EMAILS = [
+  'nicolau.coelho@peixotoecury.com.br',
+  'anacarolina.martini@peixotoecury.com.br',
+  'poliana.banqueri@peixotoecury.com.br',
+];
+function lerStorage(chave){
+  try{ return localStorage.getItem(chave) || ''; }catch(e){ return ''; }
+}
+let MEU_EMAIL = lerStorage('compromissosEmail').toLowerCase();
+let MEU_NOME = lerStorage('compromissosNome');
+let VISAO_GERAL = VISAO_GERAL_EMAILS.includes(MEU_EMAIL);
+
+function aplicarEscopoNaTela(){
+  const grupoPessoa = document.getElementById('f-pessoa').closest('.filter-group');
+  const infoBox = document.getElementById('minha-visao-info');
+  if(VISAO_GERAL){
+    grupoPessoa.style.display = '';
+    infoBox.style.display = 'none';
+  }else{
+    grupoPessoa.style.display = 'none';
+    infoBox.style.display = 'block';
+    infoBox.innerHTML = `Mostrando só os compromissos de <strong>${esc(MEU_NOME || MEU_EMAIL)}</strong>. Quem tem visão geral: coordenação e sócios.`;
+  }
+}
+window.aposLogin = function(){
+  MEU_EMAIL = (localStorage.getItem('compromissosEmail') || '').toLowerCase();
+  MEU_NOME = localStorage.getItem('compromissosNome') || '';
+  VISAO_GERAL = VISAO_GERAL_EMAILS.includes(MEU_EMAIL);
+  aplicarEscopoNaTela();
+  popularSelectPessoas();
+  renderTudo();
+};
+
 function mudarAba(aba){
   ABA_ATIVA = aba;
   ['geral','relatorio','pauta'].forEach(a => document.getElementById('tab-btn-'+a).classList.toggle('active', a === aba));
@@ -281,8 +566,10 @@ function mudarAba(aba){
 }
 
 function entregasDaAba(){
-  if(ABA_ATIVA === 'geral') return ENTREGAS;
-  return ENTREGAS.filter(e => e.compromissos_definicoes.origem === ABA_ATIVA);
+  const base = ABA_ATIVA === 'geral' ? ENTREGAS : ENTREGAS.filter(e => e.compromissos_definicoes.origem === ABA_ATIVA);
+  if(VISAO_GERAL) return base;
+  if(!MEU_EMAIL) return []; // sem login ainda -- nao mostra nada (evita "combinar" com definicoes sem e-mail)
+  return base.filter(e => (e.compromissos_definicoes.responsavel_email || '').toLowerCase() === MEU_EMAIL);
 }
 
 async function carregar(){
@@ -521,6 +808,116 @@ function exportarExcel(){
   XLSX.writeFile(wb, `Compromissos_${hojeStr()}.xlsx`);
 }
 
+// ── Novo compromisso (pontual ou recorrente) ─────────────────────────────
+const DIAS_SEMANA_LABEL_NOVO = ['Segunda','Terça','Quarta','Quinta','Sexta','Sábado','Domingo'];
+
+function ultimoDiaDoMes(ano, mes){ return new Date(ano, mes, 0).getDate(); }
+
+function valeHojeRegra(d, hoje){
+  if(d.regra_tipo === 'diaria') return true;
+  if(d.regra_tipo === 'dias_semana') return (d.regra_dias_semana||[]).includes(hoje.getDay()===0?6:hoje.getDay()-1);
+  if(d.regra_tipo === 'fim_de_mes') return hoje.getDate() === ultimoDiaDoMes(hoje.getFullYear(), hoje.getMonth()+1);
+  if(d.regra_tipo === 'dia_mes'){
+    if(d.regra_dia_mes == null) return false;
+    const ajustado = Math.min(d.regra_dia_mes, ultimoDiaDoMes(hoje.getFullYear(), hoje.getMonth()+1));
+    return hoje.getDate() === ajustado;
+  }
+  return false;
+}
+
+function abrirNovo(){
+  document.getElementById('novo-nome').value = VISAO_GERAL ? '' : MEU_NOME;
+  document.getElementById('novo-email').value = VISAO_GERAL ? '' : MEU_EMAIL;
+  document.getElementById('novo-nome').readOnly = !VISAO_GERAL;
+  document.getElementById('novo-email').readOnly = !VISAO_GERAL;
+  document.getElementById('novo-grupo').value = '';
+  document.getElementById('novo-cliente').value = '';
+  document.getElementById('novo-item').value = '';
+  document.getElementById('novo-etapa').value = '';
+  document.getElementById('novo-tipo').value = 'pontual';
+  document.getElementById('novo-data').value = hojeStr();
+  document.getElementById('novo-dia-mes').value = '';
+  document.querySelectorAll('.novo-dia-semana').forEach(cb => cb.checked = false);
+  atualizarCamposNovo();
+  document.getElementById('modal-novo').classList.add('show');
+}
+
+function fecharNovo(){
+  document.getElementById('modal-novo').classList.remove('show');
+}
+
+function atualizarCamposNovo(){
+  const tipo = document.getElementById('novo-tipo').value;
+  document.getElementById('novo-data-wrap').style.display = tipo === 'pontual' ? 'block' : 'none';
+  document.getElementById('novo-dias-semana-wrap').style.display = tipo === 'dias_semana' ? 'block' : 'none';
+  document.getElementById('novo-dia-mes-wrap').style.display = tipo === 'dia_mes' ? 'block' : 'none';
+}
+
+async function salvarNovo(){
+  const nome = document.getElementById('novo-nome').value.trim();
+  const email = document.getElementById('novo-email').value.trim().toLowerCase();
+  const item = document.getElementById('novo-item').value.trim();
+  const tipo = document.getElementById('novo-tipo').value;
+
+  if(!nome || !email.includes('@')){ toast('Preencha o responsável e um e-mail válido.', true); return; }
+  if(!item){ toast('Descreva o item / atividade.', true); return; }
+
+  const payload = {
+    origem: 'manual',
+    responsavel_nome: nome,
+    responsavel_sigla: null,
+    responsavel_email: email,
+    grupo: document.getElementById('novo-grupo').value.trim() || null,
+    cliente: document.getElementById('novo-cliente').value.trim() || null,
+    item,
+    etapa: document.getElementById('novo-etapa').value.trim() || null,
+    ativo: true,
+  };
+
+  let dataPontual = null;
+  if(tipo === 'pontual'){
+    dataPontual = document.getElementById('novo-data').value;
+    if(!dataPontual){ toast('Escolha uma data.', true); return; }
+    payload.regra_tipo = 'indefinida';
+    payload.periodicidade_original = `Pontual — ${fmtData(dataPontual)}`;
+  }else if(tipo === 'dias_semana'){
+    const dias = [...document.querySelectorAll('.novo-dia-semana:checked')].map(cb => Number(cb.value));
+    if(!dias.length){ toast('Selecione ao menos um dia da semana.', true); return; }
+    payload.regra_tipo = 'dias_semana';
+    payload.regra_dias_semana = dias;
+    payload.periodicidade_original = dias.map(d => DIAS_SEMANA_LABEL_NOVO[d]).join(', ');
+  }else if(tipo === 'dia_mes'){
+    const dia = Number(document.getElementById('novo-dia-mes').value);
+    if(!dia || dia < 1 || dia > 31){ toast('Informe um dia do mês válido (1-31).', true); return; }
+    payload.regra_tipo = 'dia_mes';
+    payload.regra_dia_mes = dia;
+    payload.periodicidade_original = `Todo dia ${dia} do mês`;
+  }else{
+    payload.regra_tipo = tipo; // 'diaria' | 'fim_de_mes'
+    payload.periodicidade_original = tipo === 'diaria' ? 'Diariamente' : 'Todo final de mês';
+  }
+
+  try{
+    const { data, error } = await sb.from('compromissos_definicoes').insert(payload).select().single();
+    if(error) throw error;
+
+    const hoje = new Date();
+    const dataEntrega = tipo === 'pontual' ? dataPontual : (valeHojeRegra(data, hoje) ? hojeStr() : null);
+    if(dataEntrega){
+      const { error: err2 } = await sb.from('compromissos_entregas')
+        .insert({ definicao_id: data.id, data: dataEntrega, status: 'pendente' });
+      if(err2 && err2.code !== '23505') throw err2; // ignora duplicidade (unique definicao_id+data)
+    }
+
+    toast('Compromisso criado.');
+    fecharNovo();
+    carregar();
+  }catch(err){
+    console.error(err);
+    toast('Não foi possível salvar: ' + (err.message||err), true);
+  }
+}
+
 // Deep-link opcional: ?pessoa=Nome%20Completo (usado no link do e-mail diário)
 (function(){
   const params = new URLSearchParams(window.location.search);
@@ -528,8 +925,9 @@ function exportarExcel(){
   if(pessoa) window._pessoaDeepLink = pessoa;
 })();
 
+aplicarEscopoNaTela();
 carregar().then(() => {
-  if(window._pessoaDeepLink){
+  if(window._pessoaDeepLink && VISAO_GERAL){
     document.getElementById('f-pessoa').value = window._pessoaDeepLink;
     renderTudo();
   }
