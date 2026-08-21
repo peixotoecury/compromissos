@@ -201,7 +201,7 @@ html.gate-open #pwGate{display:none;}
 </style>
 <script>
 try{
-  if(localStorage.getItem('voeGateOk')==='1' && localStorage.getItem('compromissosEmail')){
+  if(localStorage.getItem('compromissosGateOk')==='1' && localStorage.getItem('compromissosEmail')){
     document.documentElement.classList.add('gate-open');
   }
 }catch(e){}
@@ -292,7 +292,7 @@ try{
     var h=await sha256(pass);
     if(h===HASH && nome && email.includes('@')){
       try{
-        localStorage.setItem('voeGateOk','1');
+        localStorage.setItem('compromissosGateOk','1');
         localStorage.setItem('compromissosEmail', email);
         localStorage.setItem('compromissosNome', nome);
       }catch(e){}
