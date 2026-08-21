@@ -39,8 +39,8 @@ HEADERS = {"apikey": SUPABASE_KEY, "Authorization": f"Bearer {SUPABASE_KEY}", "C
 
 COMPROMISSOS_URL = "https://peixotoecury.github.io/compromissos/"  # atualizar apos publicar o repo
 
-# ── MODO TESTE — deixar True até a usuaria validar as regras por alguns dias ──
-MODO_TESTE = True
+# ── MODO TESTE — validado pela usuaria em 21/08/2026, envio real ativado ──
+MODO_TESTE = False
 TESTE_EMAIL = "claude.controladoria@peixotoecury.com.br"
 
 LOG = logging.getLogger("enviar_alertas_horario")
