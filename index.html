@@ -567,7 +567,7 @@ function mudarAba(aba){
 }
 
 function entregasDaAba(){
-  const base = ABA_ATIVA === 'geral' ? ENTREGAS : ENTREGAS.filter(e => e.compromissos_definicoes.origem === ABA_ATIVA);
+  const base = ABA_ATIVA === 'geral' ? ENTREGAS.filter(e => e.compromissos_definicoes.origem === 'alerta') : ENTREGAS.filter(e => e.compromissos_definicoes.origem === ABA_ATIVA);
   if(VISAO_GERAL) return base;
   if(!MEU_EMAIL) return []; // sem login ainda -- nao mostra nada (evita "combinar" com definicoes sem e-mail)
   return base.filter(e => (e.compromissos_definicoes.responsavel_email || '').toLowerCase() === MEU_EMAIL);
