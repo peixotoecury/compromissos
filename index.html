@@ -506,12 +506,13 @@ try{
     </div>
     <div class="modal-foot">
       <button class="row-btn" onclick="fecharNovo()">Cancelar</button>
-      <button class="btn-cyan btn-green" onclick="salvarNovo()">💾 Salvar</button>
+      <button class="btn-cyan btn-green" onclick="salvarNovo()">💾 Salvar e Enviar</button>
     </div>
   </div>
 </div>
 
 <script>
+const COMPROMISSOS_URL = 'https://peixotoecury.github.io/compromissos/';
 const SUPABASE_URL = 'https://rpibvjcnrseuugpkfmdj.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwaWJ2amNucnNldXVncGtmbWRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1NTc3MTcsImV4cCI6MjA5NzEzMzcxN30.ecihol8JESMH7cgFSvWKIzp-OwoPRFqdK3aCDwpCeg8';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -519,6 +520,17 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 function esc(s){ return (s==null?'':String(s)).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function fmtData(d){ if(!d) return '—'; const [y,m,day] = d.split('-'); return `${day}/${m}/${y}`; }
 function hojeStr(){ const d = new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+
+function abrirEmailNovoCompromisso(nome, email, item, etapa, cliente, grupo, quando){
+  const linhas = [`Olá, ${nome.split(' ')[0]}!`, '', 'Foi cadastrado um novo compromisso pra você no LAWgico Compromissos:', '', `Item: ${item}`];
+  if(etapa) linhas.push(`Etapa: ${etapa}`);
+  if(cliente) linhas.push(`Cliente: ${cliente}`);
+  if(grupo) linhas.push(`Grupo: ${grupo}`);
+  linhas.push(`Quando: ${quando}`, '', `Acompanhe aqui: ${COMPROMISSOS_URL}?pessoa=${encodeURIComponent(nome)}`, '',
+    'Atenciosamente,', MEU_NOME ? `${MEU_NOME} — Peixoto e Cury Advogados` : 'Peixoto e Cury Advogados');
+  const assunto = `📋 Novo compromisso: ${item}`;
+  window.location.href = `mailto:${email}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(linhas.join('\n'))}`;
+}
 
 function toast(msg, isError){
   const t = document.getElementById('toast');
@@ -912,7 +924,7 @@ async function salvarNovo(){
   if(tipo === 'pontual'){
     dataPontual = document.getElementById('novo-data').value;
     if(!dataPontual){ toast('Escolha uma data.', true); return; }
-    payload.regra_tipo = 'indefinida';
+    payload.regra_tipo = 'pontual';
     payload.periodicidade_original = `Pontual — ${fmtData(dataPontual)}`;
   }else if(tipo === 'dias_semana'){
     const dias = [...document.querySelectorAll('.novo-dia-semana:checked')].map(cb => Number(cb.value));
@@ -948,6 +960,7 @@ async function salvarNovo(){
     toast('Compromisso criado.');
     fecharNovo();
     carregar();
+    abrirEmailNovoCompromisso(nome, email, item, payload.etapa, payload.cliente, payload.grupo, payload.periodicidade_original);
   }catch(err){
     console.error(err);
     // Se a definição já tinha sido criada mas a entrega falhou, desfaz a
