@@ -442,6 +442,26 @@ try{
   </div>
 </div>
 
+<div class="modal-overlay" id="modal-justificar">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>📝 Justificar não entrega</h3>
+      <button class="modal-close" onclick="fecharJustificativa()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="item-info" id="justificar-info"></div>
+      <div class="mc-form-group">
+        <label>Motivo</label>
+        <textarea id="justificar-texto" rows="4" placeholder="Explique por que esse compromisso ainda não foi entregue…" style="width:100%;border:1px solid var(--border2);border-radius:var(--radius);padding:9px 12px;font-size:13px;font-family:var(--font);background:var(--surface2);color:var(--text);resize:vertical;"></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="row-btn" onclick="fecharJustificativa()">Cancelar</button>
+      <button class="btn-cyan" onclick="salvarJustificativa()">💾 Salvar justificativa</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modal-novo">
   <div class="modal-box">
     <div class="modal-head">
@@ -723,6 +743,7 @@ function renderTabela(){
       <td style="white-space:nowrap;">
         ${classe !== 'entregue' ? `<button class="row-btn entregue-btn" onclick="marcarEntregue(${e.id})">✅ Entreguei</button>` : `<button class="row-btn" onclick="desmarcarEntregue(${e.id})">↩ Desfazer</button>`}
         <button class="row-btn" onclick="reenviarEmail(${e.id})" style="margin-left:6px;">📧 Enviar</button>
+        ${classe !== 'entregue' ? `<button class="row-btn" onclick="abrirJustificativa(${e.id})" style="margin-left:6px;${e.justificativa ? 'border-color:var(--orange);color:var(--orange);' : ''}">📝 ${e.justificativa ? 'Ver justificativa' : 'Justificar'}</button>` : ''}
         <button class="row-btn" onclick="abrirEdicao(${d.id})" style="margin-left:6px;">⚙️ Editar regra</button>
       </td>
     </tr>`;
@@ -812,6 +833,42 @@ function atualizarCamposEdicao(){
 function fecharEdicao(){
   document.getElementById('modal-editar').classList.remove('show');
   EDIT_DEFINICAO_ID = null;
+}
+
+let JUSTIFICAR_ENTREGA_ID = null;
+
+function abrirJustificativa(entregaId){
+  const e = (window._FILTRADAS||[]).find(x => x.id === entregaId);
+  if(!e){ toast('Não encontrei os dados desse compromisso.', true); return; }
+  const d = e.compromissos_definicoes;
+  JUSTIFICAR_ENTREGA_ID = entregaId;
+  const partesInfo = [`<strong>${esc(d.responsavel_nome)}</strong>`, esc(d.item||'')];
+  if(d.etapa) partesInfo.push(`(${esc(d.etapa)})`);
+  partesInfo.push('—', fmtData(e.data));
+  document.getElementById('justificar-info').innerHTML = partesInfo.join(' ');
+  document.getElementById('justificar-texto').value = e.justificativa || '';
+  document.getElementById('modal-justificar').classList.add('show');
+}
+
+function fecharJustificativa(){
+  document.getElementById('modal-justificar').classList.remove('show');
+  JUSTIFICAR_ENTREGA_ID = null;
+}
+
+async function salvarJustificativa(){
+  if(!JUSTIFICAR_ENTREGA_ID) return;
+  const texto = document.getElementById('justificar-texto').value.trim();
+  try{
+    const { error } = await sb.from('compromissos_entregas')
+      .update({ justificativa: texto || null }).eq('id', JUSTIFICAR_ENTREGA_ID);
+    if(error) throw error;
+    toast(texto ? 'Justificativa salva.' : 'Justificativa removida.');
+    fecharJustificativa();
+    carregar();
+  }catch(err){
+    console.error(err);
+    toast('Não foi possível salvar a justificativa: ' + (err.message||err), true);
+  }
 }
 
 async function salvarEdicao(){
