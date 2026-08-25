@@ -532,6 +532,25 @@ function abrirEmailNovoCompromisso(nome, email, item, etapa, cliente, grupo, qua
   window.location.href = `mailto:${email}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(linhas.join('\n'))}`;
 }
 
+function abrirEmailLembrete(nome, email, item, etapa, cliente, grupo, dataFmt){
+  const linhas = [`Olá, ${nome.split(' ')[0]}!`, '', `Lembrete de compromisso pendente pra ${dataFmt}:`, '', `Item: ${item}`];
+  if(etapa) linhas.push(`Etapa: ${etapa}`);
+  if(cliente) linhas.push(`Cliente: ${cliente}`);
+  if(grupo) linhas.push(`Grupo: ${grupo}`);
+  linhas.push('', `Marque como entregue aqui: ${COMPROMISSOS_URL}?pessoa=${encodeURIComponent(nome)}`, '',
+    'Atenciosamente,', MEU_NOME ? `${MEU_NOME} — Peixoto e Cury Advogados` : 'Peixoto e Cury Advogados');
+  const assunto = `📋 Lembrete: ${item}`;
+  window.location.href = `mailto:${email}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(linhas.join('\n'))}`;
+}
+
+function reenviarEmail(entregaId){
+  const e = (window._FILTRADAS||[]).find(x => x.id === entregaId);
+  if(!e){ toast('Não encontrei os dados desse compromisso.', true); return; }
+  const d = e.compromissos_definicoes;
+  if(!d.responsavel_email){ toast('Esse compromisso não tem e-mail de responsável cadastrado.', true); return; }
+  abrirEmailLembrete(d.responsavel_nome, d.responsavel_email, d.item, d.etapa, d.cliente, d.grupo, fmtData(e.data));
+}
+
 function toast(msg, isError){
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -703,6 +722,7 @@ function renderTabela(){
       <td>${badge}</td>
       <td style="white-space:nowrap;">
         ${classe !== 'entregue' ? `<button class="row-btn entregue-btn" onclick="marcarEntregue(${e.id})">✅ Entreguei</button>` : `<button class="row-btn" onclick="desmarcarEntregue(${e.id})">↩ Desfazer</button>`}
+        <button class="row-btn" onclick="reenviarEmail(${e.id})" style="margin-left:6px;">📧 Enviar</button>
         <button class="row-btn" onclick="abrirEdicao(${d.id})" style="margin-left:6px;">⚙️ Editar regra</button>
       </td>
     </tr>`;
