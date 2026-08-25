@@ -38,8 +38,8 @@ HEADERS = {"apikey": SUPABASE_KEY, "Authorization": f"Bearer {SUPABASE_KEY}", "C
 COMPROMISSOS_URL = "https://peixotoecury.github.io/compromissos/"
 DESTINATARIO_REAL = "controladoria@peixotoecury.com.br"
 
-# ── MODO TESTE — deixar True ate a usuaria validar as regras por alguns dias ──
-MODO_TESTE = True
+# ── MODO TESTE — validado pela usuaria em 25/08/2026, envio real ativado ──
+MODO_TESTE = False
 TESTE_EMAIL = "claude.controladoria@peixotoecury.com.br"
 
 ULTIMO_CHECK_PATH = Path(__file__).parent / "_ultimo_check_conclusao.json"
