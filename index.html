@@ -399,12 +399,18 @@ try{
       <div class="mc-form-group">
         <label>Recorrência</label>
         <select id="edit-regra-tipo" onchange="atualizarCamposEdicao()">
+          <option value="pontual">Pontual — uma data específica</option>
           <option value="diaria">Diária (todo dia útil)</option>
           <option value="dias_semana">Dia(s) específico(s) da semana</option>
           <option value="fim_de_mes">Todo final de mês</option>
           <option value="dia_mes">Dia específico do mês</option>
           <option value="indefinida">Sem lembrete automático (só referência no painel)</option>
         </select>
+      </div>
+      <div class="mc-form-group" id="edit-data-wrap" style="display:none;">
+        <label>Data</label>
+        <input type="date" id="edit-data">
+        <div style="font-size:11px;color:var(--muted);margin-top:5px;">Cria (ou garante) uma pendência pra essa data específica, além da regra de recorrência.</div>
       </div>
       <div class="mc-form-group" id="edit-dias-semana-wrap" style="display:none;">
         <label>Dias da semana</label>
@@ -757,6 +763,7 @@ function abrirEdicao(definicaoId){
     cb.checked = (d.regra_dias_semana || []).includes(Number(cb.value));
   });
   document.getElementById('edit-dia-mes').value = d.regra_dia_mes || '';
+  document.getElementById('edit-data').value = hojeStr();
   document.getElementById('edit-ativo').checked = d.ativo !== false;
 
   atualizarCamposEdicao();
@@ -765,6 +772,7 @@ function abrirEdicao(definicaoId){
 
 function atualizarCamposEdicao(){
   const tipo = document.getElementById('edit-regra-tipo').value;
+  document.getElementById('edit-data-wrap').style.display = tipo === 'pontual' ? 'block' : 'none';
   document.getElementById('edit-dias-semana-wrap').style.display = tipo === 'dias_semana' ? 'block' : 'none';
   document.getElementById('edit-dia-mes-wrap').style.display = tipo === 'dia_mes' ? 'block' : 'none';
 }
@@ -793,10 +801,24 @@ async function salvarEdicao(){
     if(!dia || dia < 1 || dia > 31){ toast('Informe um dia do mês válido (1-31).', true); return; }
     patch.regra_dia_mes = dia;
   }
+  let dataEscolhida = null;
+  if(tipo === 'pontual'){
+    dataEscolhida = document.getElementById('edit-data').value;
+    if(!dataEscolhida){ toast('Escolha uma data.', true); return; }
+  }
   try{
     const { error } = await sb.from('compromissos_definicoes').update(patch).eq('id', EDIT_DEFINICAO_ID);
     if(error) throw error;
-    toast('Regra atualizada — vale a partir do próximo cálculo diário (ainda não afeta pendências já criadas).');
+
+    if(dataEscolhida){
+      const { error: err2 } = await sb.from('compromissos_entregas')
+        .insert({ definicao_id: EDIT_DEFINICAO_ID, data: dataEscolhida, status: 'pendente' });
+      if(err2 && err2.code !== '23505') throw err2; // ignora duplicidade (unique definicao_id+data)
+    }
+
+    toast(dataEscolhida
+      ? `Regra atualizada e pendência criada pra ${fmtData(dataEscolhida)}.`
+      : 'Regra atualizada — vale a partir do próximo cálculo diário (ainda não afeta pendências já criadas).');
     fecharEdicao();
     carregar();
   }catch(err){
