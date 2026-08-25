@@ -568,7 +568,7 @@ function mudarAba(aba){
 }
 
 function entregasDaAba(){
-  const base = ABA_ATIVA === 'geral' ? ENTREGAS.filter(e => e.compromissos_definicoes.origem === 'alerta') : ENTREGAS.filter(e => e.compromissos_definicoes.origem === ABA_ATIVA);
+  const base = ABA_ATIVA === 'geral' ? ENTREGAS.filter(e => ['alerta','manual'].includes(e.compromissos_definicoes.origem)) : ENTREGAS.filter(e => e.compromissos_definicoes.origem === ABA_ATIVA);
   if(VISAO_GERAL) return base;
   if(!MEU_EMAIL) return []; // sem login ainda -- nao mostra nada (evita "combinar" com definicoes sem e-mail)
   return base.filter(e => (e.compromissos_definicoes.responsavel_email || '').toLowerCase() === MEU_EMAIL);
@@ -909,9 +909,11 @@ async function salvarNovo(){
     payload.periodicidade_original = tipo === 'diaria' ? 'Diariamente' : 'Todo final de mês';
   }
 
+  let definicaoCriada = null;
   try{
     const { data, error } = await sb.from('compromissos_definicoes').insert(payload).select().single();
     if(error) throw error;
+    definicaoCriada = data;
 
     const hoje = new Date();
     const dataEntrega = tipo === 'pontual' ? dataPontual : (valeHojeRegra(data, hoje) ? hojeStr() : null);
@@ -926,6 +928,12 @@ async function salvarNovo(){
     carregar();
   }catch(err){
     console.error(err);
+    // Se a definição já tinha sido criada mas a entrega falhou, desfaz a
+    // definição -- senão fica um registro órfão, invisível no painel (sem
+    // nenhuma entrega associada) mas ocupando um id pra sempre.
+    if(definicaoCriada){
+      try{ await sb.from('compromissos_definicoes').delete().eq('id', definicaoCriada.id); }catch(e2){ console.error('Falha ao desfazer definição órfã:', e2); }
+    }
     toast('Não foi possível salvar: ' + (err.message||err), true);
   }
 }
