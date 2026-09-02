@@ -57,7 +57,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:13
 .tab-btn:hover{color:var(--escuro-pc);}
 .tab-btn.active{color:var(--escuro-pc);border-bottom-color:var(--azul-pc);}
 
-.main{max-width:1440px;margin:0 auto;padding:24px 24px 60px;}
+.main{max-width:1680px;margin:0 auto;padding:24px 24px 60px;}
 
 .filters-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);box-shadow:var(--shadow-pc);padding:20px 22px;margin-bottom:20px;display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;position:relative;overflow:hidden;}
 .filters-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--azul-pc),var(--escuro-pc));}
@@ -377,13 +377,13 @@ try{
     <div class="table-wrap">
       <table class="comp-table">
         <colgroup>
+          <col style="width:7%;">
+          <col style="width:10%;">
           <col style="width:9%;">
-          <col style="width:13%;">
-          <col style="width:12%;">
-          <col style="width:30%;">
-          <col style="width:16%;">
-          <col style="width:10%;">
-          <col style="width:10%;">
+          <col style="width:21%;">
+          <col style="width:11%;">
+          <col style="width:7%;">
+          <col style="width:35%;">
         </colgroup>
         <thead>
           <tr><th>Data</th><th>Responsável</th><th>Grupo/Cliente</th><th>Item</th><th>Etapa</th><th>Status</th><th>Ações</th></tr>
@@ -749,11 +749,13 @@ function renderTabela(){
       <td>${esc(d.item||'')}</td>
       <td>${esc(d.etapa||'—')}</td>
       <td>${badge}</td>
-      <td style="white-space:nowrap;">
+      <td>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
         ${classe !== 'entregue' ? `<button class="row-btn entregue-btn" onclick="marcarEntregue(${e.id})">✅ Entreguei</button>` : `<button class="row-btn" onclick="desmarcarEntregue(${e.id})">↩ Desfazer</button>`}
-        <button class="row-btn" onclick="reenviarEmail(${e.id})" style="margin-left:6px;">📧 Enviar</button>
-        ${classe !== 'entregue' ? `<button class="row-btn" onclick="abrirJustificativa(${e.id})" style="margin-left:6px;${e.justificativa ? 'border-color:var(--orange);color:var(--orange);' : ''}">📝 ${e.justificativa ? 'Ver justificativa' : 'Justificar'}</button>` : ''}
-        <button class="row-btn" onclick="abrirEdicao(${d.id})" style="margin-left:6px;">⚙️ Editar regra</button>
+        <button class="row-btn" onclick="reenviarEmail(${e.id})">📧 Enviar</button>
+        ${classe !== 'entregue' ? `<button class="row-btn" onclick="abrirJustificativa(${e.id})" style="${e.justificativa ? 'border-color:var(--orange);color:var(--orange);' : ''}">📝 ${e.justificativa ? 'Ver justificativa' : 'Justificar'}</button>` : ''}
+        <button class="row-btn" onclick="abrirEdicao(${d.id})">⚙️ Editar regra</button>
+        </div>
       </td>
     </tr>`;
   }).join('');
