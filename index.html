@@ -1222,7 +1222,8 @@ function popularSelectPessoas(){
   selC.value = atualC;
 }
 
-function filtrarTarefas(){
+function filtrarTarefas(opcoes){
+  const ignorarStatus = opcoes && opcoes.ignorarStatus;
   const pessoa = document.getElementById('f-pessoa').value;
   const grupo = document.getElementById('f-grupo').value;
   const cliente = document.getElementById('f-cliente').value;
@@ -1238,9 +1239,11 @@ function filtrarTarefas(){
     if(grupo && t.grupo !== grupo) return false;
     if(cliente && t.cliente !== cliente) return false;
     if(prioridade && t.prioridade !== prioridade) return false;
-    if(status === 'pendente' && classe === 'concluido') return false;
-    if(status === 'atrasado' && classe !== 'atrasado') return false;
-    if(status && !['pendente','atrasado'].includes(status) && classe !== status && !(status===t.status)) return false;
+    if(!ignorarStatus){
+      if(status === 'pendente' && classe === 'concluido') return false;
+      if(status === 'atrasado' && classe !== 'atrasado') return false;
+      if(status && !['pendente','atrasado'].includes(status) && classe !== status && !(status===t.status)) return false;
+    }
     if(de && t.data < de) return false;
     if(ate && t.data > ate) return false;
     if(busca){
@@ -1253,7 +1256,7 @@ function filtrarTarefas(){
 
 // ── Tiles ───────────────────────────────────────────────────────────
 function renderTiles(){
-  const todas = tarefasDaOrigem();
+  const todas = filtrarTarefas({ignorarStatus:true});
   const hoje = hojeStr();
   const em7dias = new Date(Date.now() - 7*86400000);
   const total = todas.length;
@@ -1322,7 +1325,7 @@ function renderDonutChart(titulo, contagens){
   </div></div>`;
 }
 function renderCharts(){
-  const todas = tarefasDaOrigem();
+  const todas = filtrarTarefas({ignorarStatus:true});
   const porResp = {}; const porGrupo = {}; const porStatus = {}; const porPrazo = {}; const porPapel = {};
   const hoje = hojeStr();
   todas.forEach(t => {
