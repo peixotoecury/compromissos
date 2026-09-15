@@ -82,7 +82,7 @@ def buscar_definicoes(horario):
 def upsert_pendencias_hoje(definicoes_hoje, hoje):
     if not definicoes_hoje:
         return
-    linhas = [{"definicao_id": d["id"], "data": hoje.isoformat(), "status": "pendente"} for d in definicoes_hoje]
+    linhas = [{"definicao_id": d["id"], "data": hoje.isoformat(), "status": "a_fazer"} for d in definicoes_hoje]
     r = requests.post(
         f"{SUPABASE_URL}/rest/v1/compromissos_entregas",
         headers={**HEADERS, "Prefer": "resolution=ignore-duplicates,return=minimal"},

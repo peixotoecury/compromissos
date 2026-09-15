@@ -1,27 +1,30 @@
 # -*- coding: utf-8 -*-
 """
-notificar_conclusao.py — LAWgico Compromissos
+notificar_conclusao.py — LAWgico Painel de Tarefas
 
 Roda a cada poucos minutos (Tarefa Agendada do Windows, ex: a cada 15 min,
-dias uteis, horario comercial): checa quem marcou compromisso(s) como
-"entregue" desde a ultima checagem e manda 1 e-mail resumindo pra
-controladoria@peixotoecury.com.br via automacao do Outlook (.Send() de
-verdade, ninguem precisa clicar em nada).
+dias uteis, horario comercial): checa quem marcou tarefa(s) como "concluido"
+desde a ultima checagem e, pra cada AUTOMACAO ativa cujo escopo bater com o
+item concluido, manda 1 e-mail resumindo pro destinatario da regra via
+automacao do Outlook (.Send() de verdade, ninguem precisa clicar em nada).
+
+Automacoes ficam na tabela compromissos_automacoes (criada/editada pela tela
+"Automacoes" do index.html): cada regra tem escopo_tipo ('todos' | 'grupo' |
+'pessoa'), escopo_valor e email_notificar. Uma regra 'todos' pega qualquer
+conclusao; 'grupo'/'pessoa' so pegam itens cujo grupo/responsavel bate. Uma
+mesma conclusao pode disparar varias regras (e-mails diferentes).
 
 Guarda o timestamp da ultima checagem em ULTIMO_CHECK_PATH (arquivo local,
 fora do git) pra nunca notificar a mesma conclusao duas vezes nem perder
 uma entre execucoes.
 
-Se nada foi concluido desde a ultima checagem, nao manda e-mail nenhum
-(evita spam de "nada aconteceu").
-
-MODO_TESTE=True (padrao): manda pra TESTE_EMAIL em vez do destinatario
-real, com aviso no assunto -- usar assim ate a usuaria validar por alguns
-dias. Depois, mudar pra False (mesmo fluxo dos outros scripts desta pasta).
+Se nada foi concluido desde a ultima checagem (ou nenhuma regra ativa bate
+com o que foi concluido), nao manda e-mail nenhum.
 """
 import json
 import logging
 import sys
+from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -36,11 +39,6 @@ SUPABASE_KEY = ("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsIn
 HEADERS = {"apikey": SUPABASE_KEY, "Authorization": f"Bearer {SUPABASE_KEY}", "Content-Type": "application/json"}
 
 COMPROMISSOS_URL = "https://peixotoecury.github.io/compromissos/"
-DESTINATARIO_REAL = "controladoria@peixotoecury.com.br"
-
-# ── MODO TESTE — validado pela usuaria em 25/08/2026, envio real ativado ──
-MODO_TESTE = False
-TESTE_EMAIL = "claude.controladoria@peixotoecury.com.br"
 
 ULTIMO_CHECK_PATH = Path(__file__).parent / "_ultimo_check_conclusao.json"
 
@@ -52,7 +50,7 @@ def ler_ultimo_check():
     if not ULTIMO_CHECK_PATH.exists():
         # Primeira execucao: nao varre o historico inteiro, comeca a contar a
         # partir de agora (senao manda 1 e-mail gigante com tudo que ja foi
-        # entregue desde sempre).
+        # concluido desde sempre).
         return datetime.now(timezone.utc).isoformat()
     return json.loads(ULTIMO_CHECK_PATH.read_text(encoding="utf-8"))["ultimo_check"]
 
@@ -66,7 +64,7 @@ def buscar_concluidos_desde(ultimo_check):
         f"{SUPABASE_URL}/rest/v1/compromissos_entregas",
         headers=HEADERS, timeout=30,
         params={
-            "status": "eq.entregue",
+            "status": "eq.concluido",
             "entregue_em": f"gt.{ultimo_check}",
             "select": "*,compromissos_definicoes(*)",
             "order": "entregue_em.asc",
@@ -76,7 +74,28 @@ def buscar_concluidos_desde(ultimo_check):
     return [e for e in r.json() if e.get("compromissos_definicoes")]
 
 
-def montar_corpo(itens):
+def buscar_automacoes_ativas():
+    r = requests.get(
+        f"{SUPABASE_URL}/rest/v1/compromissos_automacoes",
+        headers=HEADERS, timeout=30,
+        params={"ativo": "eq.true", "select": "*"},
+    )
+    r.raise_for_status()
+    return r.json()
+
+
+def automacao_bate(regra, definicao):
+    tipo = regra.get("escopo_tipo")
+    if tipo == "todos":
+        return True
+    if tipo == "grupo":
+        return (definicao.get("grupo") or "").strip() == (regra.get("escopo_valor") or "").strip()
+    if tipo == "pessoa":
+        return (definicao.get("responsavel_nome") or "").strip() == (regra.get("escopo_valor") or "").strip()
+    return False
+
+
+def montar_corpo(itens, nome_regra):
     def linha(i):
         d = i["compromissos_definicoes"]
         partes = [f"<b>{d.get('responsavel_nome') or '—'}</b>", "—", d.get("item") or ""]
@@ -88,7 +107,7 @@ def montar_corpo(itens):
         partes.append(f"<span style='color:#7E98AA'>[{hora}]</span>" if hora else "")
         return " ".join(p for p in partes if p)
 
-    corpo = "Compromissos marcados como <b style='color:#117A65'>entregues</b> desde a última checagem:<br><br>"
+    corpo = f"Automação <b>{nome_regra}</b> — tarefas marcadas como <b style='color:#117A65'>concluídas</b> desde a última checagem:<br><br>"
     corpo += "<ul>" + "".join(f"<li>{linha(i)}</li>" for i in itens) + "</ul>"
     corpo += (f"<br><a href='{COMPROMISSOS_URL}'>Ver painel completo</a><br><br>"
               f"Atenciosamente,<br>Controladoria — Peixoto e Cury Advogados")
@@ -116,16 +135,34 @@ def main():
         LOG.info("Nada novo. Concluído.")
         return
 
-    corpo = montar_corpo(concluidos)
-    destinatario_real = DESTINATARIO_REAL
-    assunto = f"✅ {len(concluidos)} compromisso(s) concluído(s) — Compromissos"
-    if MODO_TESTE:
-        destinatario_real = TESTE_EMAIL
-        assunto = f"[TESTE — seria p/ {DESTINATARIO_REAL}] {assunto}"
+    automacoes = buscar_automacoes_ativas()
+    LOG.info(f"Automações ativas: {len(automacoes)}")
 
-    LOG.info(f"Enviando pra {destinatario_real} "
-             f"({'MODO TESTE, real=' + DESTINATARIO_REAL if MODO_TESTE else 'real'}) — {len(concluidos)} item(ns)")
-    enviar_email(destinatario_real, assunto, corpo)
+    if not automacoes:
+        salvar_ultimo_check(agora)
+        LOG.info("Nenhuma automação ativa cadastrada. Nada enviado (rode add_automacoes.sql se ainda não rodou).")
+        return
+
+    # Agrupa: pra cada regra que bater, acumula os itens que ela deve listar.
+    por_regra = defaultdict(list)
+    for item in concluidos:
+        d = item["compromissos_definicoes"]
+        for regra in automacoes:
+            if automacao_bate(regra, d):
+                por_regra[regra["id"]].append(item)
+
+    if not por_regra:
+        salvar_ultimo_check(agora)
+        LOG.info("Nenhuma automação bateu com os itens concluídos. Nada enviado.")
+        return
+
+    regras_por_id = {r["id"]: r for r in automacoes}
+    for regra_id, itens in por_regra.items():
+        regra = regras_por_id[regra_id]
+        corpo = montar_corpo(itens, regra["nome"])
+        assunto = f"✅ {len(itens)} tarefa(s) concluída(s) — {regra['nome']}"
+        LOG.info(f"Enviando pra {regra['email_notificar']} (regra '{regra['nome']}') — {len(itens)} item(ns)")
+        enviar_email(regra["email_notificar"], assunto, corpo)
 
     salvar_ultimo_check(agora)
     LOG.info("Concluído.")

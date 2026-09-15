@@ -34,7 +34,7 @@ HEADERS = {"apikey": SUPABASE_KEY, "Authorization": f"Bearer {SUPABASE_KEY}", "C
 COMPROMISSOS_URL = "https://peixotoecury.github.io/compromissos/"  # atualizar apos publicar o repo
 
 # ── MODO TESTE — deixar True até a usuaria validar as regras por alguns dias ──
-MODO_TESTE = True
+MODO_TESTE = False
 TESTE_EMAIL = "claude.controladoria@peixotoecury.com.br"
 
 LOG = logging.getLogger("enviar_lembretes_diarios")
@@ -80,9 +80,9 @@ def upsert_pendencias_hoje(definicoes, hoje):
     LOG.info(f"Definições válidas hoje ({hoje.isoformat()}): {len(aplicaveis_hoje)}")
     if not aplicaveis_hoje:
         return
-    linhas = [{"definicao_id": d["id"], "data": hoje.isoformat(), "status": "pendente"} for d in aplicaveis_hoje]
+    linhas = [{"definicao_id": d["id"], "data": hoje.isoformat(), "status": "a_fazer"} for d in aplicaveis_hoje]
     r = requests.post(
-        f"{SUPABASE_URL}/rest/v1/compromissos_entregas",
+        f"{SUPABASE_URL}/rest/v1/compromissos_entregas?on_conflict=definicao_id,data",
         headers={**HEADERS, "Prefer": "resolution=ignore-duplicates,return=minimal"},
         json=linhas, timeout=30,
     )
@@ -90,14 +90,22 @@ def upsert_pendencias_hoje(definicoes, hoje):
 
 
 def buscar_pendencias_em_aberto():
-    """Tudo que ainda esta 'pendente' (hoje ou atrasado), com a definicao embutida."""
+    """Tudo que ainda nao chegou em 'concluido' (qualquer estagio do quadro --
+    a_fazer/em_andamento/aguardando_terceiro/para_validacao -- hoje ou
+    atrasado), com a definicao embutida.
+
+    Ignora pendencia cuja definicao ja foi desativada (ex: sync_definicoes.py
+    rodou de novo e o item saiu da planilha) -- senao ela fica aparecendo pra
+    sempre como "atrasada" no e-mail, já que nada nunca marca como concluido
+    um compromisso que nao existe mais."""
     r = requests.get(
         f"{SUPABASE_URL}/rest/v1/compromissos_entregas"
-        f"?status=eq.pendente&select=*,compromissos_definicoes(*)&order=data.asc",
+        f"?status=neq.concluido&select=*,compromissos_definicoes(*)&order=data.asc",
         headers=HEADERS, timeout=30,
     )
     r.raise_for_status()
-    return [e for e in r.json() if e.get("compromissos_definicoes")]
+    return [e for e in r.json()
+            if e.get("compromissos_definicoes") and e["compromissos_definicoes"].get("ativo")]
 
 
 def montar_corpo(nome, itens, hoje):
@@ -150,19 +158,26 @@ def main():
 
     pendencias = buscar_pendencias_em_aberto()
     por_pessoa = defaultdict(list)
+    nome_por_email = {}
     sem_email = []
     for p in pendencias:
         d = p["compromissos_definicoes"]
-        if not d.get("responsavel_email"):
+        email = d.get("responsavel_email")
+        if not email:
             sem_email.append(d.get("responsavel_nome"))
             continue
-        por_pessoa[(d["responsavel_nome"], d["responsavel_email"])].append(p)
+        # Agrupa só por e-mail (não por nome+e-mail) -- variação de grafia do
+        # mesmo nome entre linhas diferentes já causou 2 e-mails pra mesma
+        # pessoa no mesmo dia (bug confirmado em 24/08/2026).
+        nome_por_email.setdefault(email, d.get("responsavel_nome"))
+        por_pessoa[email].append(p)
 
     if sem_email:
         LOG.warning(f"Pendências sem e-mail resolvido (não notificadas): {sorted(set(sem_email))}")
 
     LOG.info(f"Pessoas com pendência em aberto: {len(por_pessoa)}")
-    for (nome, email), itens in por_pessoa.items():
+    for email, itens in por_pessoa.items():
+        nome = nome_por_email[email]
         corpo = montar_corpo(nome, itens, hoje)
         destinatario_real = email
         assunto = f"📋 Seus compromissos de hoje (Time B e Controladoria) — {hoje.strftime('%d/%m/%Y')}"
