@@ -942,6 +942,47 @@ let ORIGEM_ATIVA = 'geral';
 let PAGINA_ATIVA = 'tarefas';
 let VIEW_MODO = 'quadro';
 
+// ── Filtro Time B (Grupo B/B1/B2/B3) ─────────────────────────────────────
+// A usuária pediu que a view só mostre gente do time dela (Grupo B) — isso
+// importa principalmente pra origem "Agendas", que lê prazos_agendas, uma
+// tabela COMPARTILHADA por todos os times do escritório, sem filtro de
+// equipe nenhum. Critério PRIMÁRIO: o campo `grupo` que cada
+// compromisso/agenda já carrega (confirmado nos dados reais: 'B', 'B1',
+// 'B2', 'B3' em compromissos_definicoes; "Grupo B1" etc. em
+// prazos_agendas.grupo_processo — daí o replace do prefixo "grupo "/
+// "equipe " abaixo). Fallback por NOME só entra quando o item não tem
+// grupo preenchido (ex.: compromisso manual antigo sem esse campo) —
+// roster extraído de "Divisão do time B e Controladoria.xlsb" (abas
+// "Alerta de Atividades" e "Divisão da Gestão", 2026-09-15).
+function norm(s){
+  return (s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/\s+/g,' ').trim().toLowerCase();
+}
+function grupoEhTimeB(grupo){
+  if(!grupo) return false;
+  const g = norm(grupo).replace(/^(grupo|equipe)\s+/, '');
+  return /^b\d*$/.test(g);
+}
+const TIME_B_ROSTER_FALLBACK = [
+  'Carol Honório', 'Nicolau Guimarães', 'Nicolau Rafael Guimarães Coelho', 'Beatriz Luna', 'Gabi',
+  'Anna Carolina Balbino Gatti Baani', 'Beatriz Santiago de Souza', 'Brenna Malta',
+  'Bruna Cembranelli Fazenda', 'Bruna Cembranelli', 'Cícera Gabriela', 'Evandro Vessoni',
+  'Geovanna Rodrigues', 'Guilherme Silva Morimoto', 'Jennifer Nogueira', 'Juliana Perucci',
+  'Letícia Meneghini Fontes', 'Lucas Gusthavo', 'Maria Carolina', 'Mariana Arruda Teberges',
+  'Mariana Arruda Terberges', 'Rafael Rocha Ferreira', 'Rafaella Wittmann', 'Raica Kwok',
+  'Raphaela Fernandes', 'Sofia Freire', 'Tamara Silva Marcílio', 'Vanessa de Cassia Castrequini Rosa',
+];
+const TIME_B_ROSTER_NORM = new Set(TIME_B_ROSTER_FALLBACK.map(norm));
+function nomeEhTimeB(nome){
+  const n = norm(nome);
+  if(!n) return false;
+  for(const r of TIME_B_ROSTER_NORM){ if(n === r || n.includes(r) || r.includes(n)) return true; }
+  return false;
+}
+function ehDoTimeB(nome, grupo){
+  if(grupo) return grupoEhTimeB(grupo);
+  return nomeEhTimeB(nome);
+}
+
 // ── Identificação / escopo de visão ──────────────────────────────────────
 const VISAO_GERAL_EMAILS = [
   'nicolau.coelho@peixotoecury.com.br',
@@ -1079,7 +1120,7 @@ function tarefasDaOrigem(){
       const meuNorm = MEU_NOME.trim().toLowerCase();
       base = base.filter(t => (t.responsavelNome||'').toLowerCase().includes(meuNorm) || (t.respAtualNome||'').toLowerCase() === meuNorm);
     }
-    return base;
+    return base.filter(t => ehDoTimeB(t.responsavelNome, t.grupo) || ehDoTimeB(t.respAtualNome, t.grupo));
   }
   const src = ORIGEM_ATIVA === 'geral' ? ENTREGAS.filter(e => ['alerta','manual'].includes(e.compromissos_definicoes.origem)) : ENTREGAS.filter(e => e.compromissos_definicoes.origem === ORIGEM_ATIVA);
   let base = (VISAO_GERAL ? src : (MEU_EMAIL ? src.filter(e => (e.compromissos_definicoes.responsavel_email||'').toLowerCase() === MEU_EMAIL) : []));
@@ -1095,7 +1136,7 @@ function tarefasDaOrigem(){
       respAtualNome: e.resp_atual_nome || '', respAtualEmail: e.resp_atual_email || '',
       justificativa: e.justificativa || '', responsavelPapel: d.responsavel_papel || '',
     };
-  });
+  }).filter(t => ehDoTimeB(t.responsavelNome, t.grupo) || ehDoTimeB(t.respAtualNome, t.grupo));
 }
 function normalizarStatus(s){
   if(s === 'pendente') return 'a_fazer';
