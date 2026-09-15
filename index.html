@@ -1352,7 +1352,8 @@ function filtrarPorPessoa(nome){
   document.getElementById('f-pessoa').value = nome;
   document.getElementById('f-status').value = '';
   renderTudo();
-  document.getElementById('view-quadro').scrollIntoView({behavior:'smooth', block:'start'});
+  const alvo = VIEW_MODO === 'quadro' ? document.getElementById('view-quadro') : document.getElementById('view-tabela');
+  alvo.scrollIntoView({behavior:'smooth', block:'start'});
 }
 
 // ── Kanban ──────────────────────────────────────────────────────────
@@ -1533,7 +1534,7 @@ function renderTabela(){
     const badge = classe === 'atrasado' ? '<span class="badge badge-atrasado">⚠ Atrasado</span>' : `<span class="badge badge-${t.status}">${STATUS_LABEL[t.status]}</span>`;
     return `<tr>
       <td class="mono">${fmtData(t.data)}</td>
-      <td>${esc(t.responsavelNome)}</td>
+      <td><span class="bar-lbl-click" style="width:auto;" onclick="filtrarPorPessoa('${esc(t.responsavelNome).replace(/'/g,"\\'")}')">${esc(t.responsavelNome)}</span></td>
       <td>${esc(t.grupo||'')}${t.cliente ? ' · ' + esc(t.cliente) : ''}</td>
       <td><span class="qc-prio ${t.prioridade}">${PRIO_LABEL[t.prioridade]}</span></td>
       <td>${esc(t.item||'')}</td>
