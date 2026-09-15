@@ -133,6 +133,8 @@ button{cursor:pointer;}
 .chart-card h3{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:var(--escuro-pc);margin-bottom:14px;}
 .bar-row{display:flex;align-items:center;gap:8px;margin-bottom:9px;font-size:11.5px;}
 .bar-row .bar-lbl{width:76px;flex-shrink:0;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bar-row .bar-lbl-click{cursor:pointer;text-decoration:underline;text-decoration-color:transparent;transition:color .12s,text-decoration-color .12s;}
+.bar-row .bar-lbl-click:hover{color:var(--azul-pc);text-decoration-color:var(--azul-pc);}
 .bar-row .bar-track{flex:1;background:var(--surface2);border-radius:6px;height:16px;overflow:hidden;}
 .bar-row .bar-fill{height:100%;background:linear-gradient(90deg,var(--azul-pc),var(--escuro-pc));border-radius:6px;min-width:2px;transition:width .3s;}
 .bar-row .bar-val{width:26px;text-align:right;font-family:var(--mono);font-weight:700;color:var(--escuro-pc);flex-shrink:0;}
@@ -1296,13 +1298,13 @@ function donutSVGBackground(valores){
   });
   return `conic-gradient(${partes.join(',')})`;
 }
-function renderBarChart(titulo, contagens){
+function renderBarChart(titulo, contagens, clicavel){
   const entradas = Object.entries(contagens).sort((a,b)=>b[1]-a[1]).slice(0,8);
   if(!entradas.length) return `<div class="chart-card"><h3>${titulo}</h3><div class="chart-empty">Sem dados</div></div>`;
   const max = Math.max(...entradas.map(e=>e[1]));
   const linhas = entradas.map(([nome,n]) => `
     <div class="bar-row">
-      <div class="bar-lbl" title="${esc(nome)}">${esc(nome)}</div>
+      <div class="bar-lbl${clicavel?' bar-lbl-click':''}" title="${esc(nome)}${clicavel?' — clique pra ver as tarefas dela/dele':''}"${clicavel?` onclick="filtrarPorPessoa('${esc(nome).replace(/'/g,"\\'")}')"`:''}>${esc(nome)}</div>
       <div class="bar-track"><div class="bar-fill" style="width:${Math.max(4,n/max*100)}%"></div></div>
       <div class="bar-val">${n}</div>
     </div>`).join('');
@@ -1336,11 +1338,21 @@ function renderCharts(){
     if(chave) porPrazo[chave] = (porPrazo[chave]||0) + 1;
   });
   document.getElementById('charts-wrap').innerHTML =
-    renderBarChart('Tarefas por responsável', porResp) +
+    renderBarChart('Tarefas por responsável', porResp, true) +
     renderDonutChart('Estágio das tarefas', porStatus) +
     renderBarChart('Tarefas por grupo', porGrupo) +
     renderDonutChart('Prazo das tarefas', porPrazo) +
     renderBarChart('Carga por função', porPapel);
+}
+
+// Clicar num nome (gráfico "por responsável" ou card do quadro) filtra o
+// painel inteiro pra só as tarefas daquela pessoa — like o "drill-down"
+// que a usuária pediu ("clicar na Brenna e ir pras atividades dela").
+function filtrarPorPessoa(nome){
+  document.getElementById('f-pessoa').value = nome;
+  document.getElementById('f-status').value = '';
+  renderTudo();
+  document.getElementById('view-quadro').scrollIntoView({behavior:'smooth', block:'start'});
 }
 
 // ── Kanban ──────────────────────────────────────────────────────────
@@ -1357,7 +1369,9 @@ function cardHTML(t){
       <span class="mono" style="font-size:10px;color:var(--muted2);">${fmtData(t.data)}</span>
     </div>
     <div class="qc-meta">
-      <div class="qc-who"><span class="qc-avatar">${iniciais(t.respAtualNome || t.responsavelNome)}</span><span>${esc((t.respAtualNome || t.responsavelNome || '').split(' ')[0] || '—')}</span></div>
+      <div class="qc-who" onclick="event.stopPropagation(); filtrarPorPessoa('${esc(t.respAtualNome || t.responsavelNome).replace(/'/g,"\\'")}')" title="Ver todas as tarefas de ${esc(t.respAtualNome || t.responsavelNome)}" style="cursor:pointer;">
+        <span class="qc-avatar">${iniciais(t.respAtualNome || t.responsavelNome)}</span><span>${esc((t.respAtualNome || t.responsavelNome || '').split(' ')[0] || '—')}</span>
+      </div>
       ${t.grupo || t.cliente ? `<span title="${esc(t.grupo)} ${esc(t.cliente)}">${esc(t.cliente || t.grupo)}</span>` : ''}
     </div>
   </div>`;
