@@ -481,7 +481,7 @@ try{
     <div class="topbar">
       <div class="tb-title-wrap">
         <h1 id="tb-titulo">Painel de Tarefas</h1>
-        <div class="tb-sub" id="tb-subtitulo">Controladoria Jurídica</div>
+        <div class="tb-sub" id="tb-subtitulo"></div>
       </div>
       <div class="tb-search">
         <span class="tb-search-ic">🔍</span>
@@ -1056,7 +1056,7 @@ function irPagina(pagina){
   document.getElementById('pagina-tarefas').style.display = pagina === 'tarefas' ? '' : 'none';
   document.getElementById('pagina-automacoes').style.display = pagina === 'automacoes' ? '' : 'none';
   document.getElementById('pagina-placeholder').style.display = (pagina !== 'tarefas' && pagina !== 'automacoes') ? '' : 'none';
-  const titulos = {tarefas:['Painel de Tarefas','Controladoria Jurídica'], automacoes:['Automações','Regras de notificação por e-mail'],
+  const titulos = {tarefas:['Painel de Tarefas',''], automacoes:['Automações','Regras de notificação por e-mail'],
     meupainel:['Meu Painel',''], time:['Time',''], calendario:['Calendário',''], reuniao:['Reunião de Time',''], documentos:['Documentos',''], config:['Configurações','']};
   const t = titulos[pagina] || ['—',''];
   document.getElementById('tb-titulo').textContent = t[0];
