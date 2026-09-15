@@ -963,7 +963,7 @@ function grupoEhTimeB(grupo){
   return /^b\d*$/.test(g);
 }
 const TIME_B_ROSTER_FALLBACK = [
-  'Carol Honório', 'Nicolau Guimarães', 'Nicolau Rafael Guimarães Coelho', 'Beatriz Luna', 'Gabi',
+  'Carol Honório', 'Nicolau Guimarães', 'Nicolau Rafael Guimarães Coelho', 'Gabi',
   'Anna Carolina Balbino Gatti Baani', 'Beatriz Santiago de Souza', 'Brenna Malta',
   'Bruna Cembranelli Fazenda', 'Bruna Cembranelli', 'Cícera Gabriela', 'Evandro Vessoni',
   'Geovanna Rodrigues', 'Guilherme Silva Morimoto', 'Jennifer Nogueira', 'Juliana Perucci',
@@ -972,15 +972,39 @@ const TIME_B_ROSTER_FALLBACK = [
   'Raphaela Fernandes', 'Sofia Freire', 'Tamara Silva Marcílio', 'Vanessa de Cassia Castrequini Rosa',
 ];
 const TIME_B_ROSTER_NORM = new Set(TIME_B_ROSTER_FALLBACK.map(norm));
+// Confirmado pela usuária 2026-09-15: essas pessoas são da Controladoria,
+// não do Time B propriamente — mesmo quando algum registro tem `grupo`
+// marcado como B/B1/B2/B3 por engano (ex.: achamos "Beatriz Luna | B3" nos
+// dados reais, contradizendo isso). A negação abaixo vale MAIS que o campo
+// `grupo` do item.
+const TIME_B_DENYLIST_NORM = new Set(['Beatriz Luna', 'Giullia Leme', 'Giullia'].map(norm));
 function nomeEhTimeB(nome){
   const n = norm(nome);
   if(!n) return false;
   for(const r of TIME_B_ROSTER_NORM){ if(n === r || n.includes(r) || r.includes(n)) return true; }
   return false;
 }
+function nomeNaDenylist(nome){
+  const n = norm(nome);
+  if(!n) return false;
+  for(const d of TIME_B_DENYLIST_NORM){ if(n === d || n.includes(d) || d.includes(n)) return true; }
+  return false;
+}
 function ehDoTimeB(nome, grupo){
+  if(nomeNaDenylist(nome)) return false;
   if(grupo) return grupoEhTimeB(grupo);
   return nomeEhTimeB(nome);
+}
+// Checa o item inteiro (responsável original + responsável atual, se
+// houver). A denylist é checada primeiro e vale pros dois nomes — sem
+// isso, um item com responsavelNome negado mas respAtualNome vazio
+// passava de novo pelo `grupo` sozinho (ehDoTimeB('', grupo) não acha
+// nada na denylist porque não há nome pra negar) e furava o filtro.
+function itemEhTimeB(t){
+  if(nomeNaDenylist(t.responsavelNome) || (t.respAtualNome && nomeNaDenylist(t.respAtualNome))) return false;
+  if(ehDoTimeB(t.responsavelNome, t.grupo)) return true;
+  if(t.respAtualNome && ehDoTimeB(t.respAtualNome, t.grupo)) return true;
+  return false;
 }
 
 // ── Identificação / escopo de visão ──────────────────────────────────────
@@ -1120,7 +1144,7 @@ function tarefasDaOrigem(){
       const meuNorm = MEU_NOME.trim().toLowerCase();
       base = base.filter(t => (t.responsavelNome||'').toLowerCase().includes(meuNorm) || (t.respAtualNome||'').toLowerCase() === meuNorm);
     }
-    return base.filter(t => ehDoTimeB(t.responsavelNome, t.grupo) || ehDoTimeB(t.respAtualNome, t.grupo));
+    return base.filter(itemEhTimeB);
   }
   const src = ORIGEM_ATIVA === 'geral' ? ENTREGAS.filter(e => ['alerta','manual'].includes(e.compromissos_definicoes.origem)) : ENTREGAS.filter(e => e.compromissos_definicoes.origem === ORIGEM_ATIVA);
   let base = (VISAO_GERAL ? src : (MEU_EMAIL ? src.filter(e => (e.compromissos_definicoes.responsavel_email||'').toLowerCase() === MEU_EMAIL) : []));
@@ -1136,7 +1160,7 @@ function tarefasDaOrigem(){
       respAtualNome: e.resp_atual_nome || '', respAtualEmail: e.resp_atual_email || '',
       justificativa: e.justificativa || '', responsavelPapel: d.responsavel_papel || '',
     };
-  }).filter(t => ehDoTimeB(t.responsavelNome, t.grupo) || ehDoTimeB(t.respAtualNome, t.grupo));
+  }).filter(itemEhTimeB);
 }
 function normalizarStatus(s){
   if(s === 'pendente') return 'a_fazer';
