@@ -1084,13 +1084,33 @@ function mudarView(v){
 }
 
 // ── Carga de dados ────────────────────────────────────────────────────
+// Supabase-js (fetch + websocket por baixo) já foi visto TRAVANDO sem
+// erro nenhum (nem resolve nem rejeita) em vez de falhar rápido — o
+// usuário ficava olhando pra tela em branco pra sempre, sem aviso.
+// comTimeout() garante que toda carga tem um prazo: se estourar, vira erro
+// de verdade (mostrado na tela, com botão de tentar de novo) em vez de
+// silêncio infinito.
+function comTimeout(promise, ms, label){
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error(`Tempo esgotado carregando ${label} (${ms/1000}s) — a conexão com o Supabase pode estar lenta ou travada.`)), ms)),
+  ]);
+}
+
+function mostrarCarregando(){
+  document.getElementById('erro-conexao').innerHTML = '';
+  document.getElementById('tiles-wrap').innerHTML = '<div class="empty-state" style="grid-column:1/-1;">Carregando…</div>';
+  document.getElementById('charts-wrap').innerHTML = '';
+  document.getElementById('quadro-wrap').innerHTML = '<div class="empty-state" style="grid-column:1/-1;">Carregando…</div>';
+}
+
 async function carregar(){
+  mostrarCarregando();
   try{
-    const { data, error } = await sb
-      .from('compromissos_entregas')
-      .select('*, compromissos_definicoes(*)')
-      .order('data', { ascending: false })
-      .limit(2000);
+    const { data, error } = await comTimeout(
+      sb.from('compromissos_entregas').select('*, compromissos_definicoes(*)').order('data', { ascending: false }).limit(2000),
+      15000, 'os compromissos'
+    );
     if(error) throw error;
     ENTREGAS = (data || []).filter(e => e.compromissos_definicoes); // ignora orfãos
     document.getElementById('erro-conexao').innerHTML = '';
@@ -1099,21 +1119,26 @@ async function carregar(){
   }catch(err){
     console.error(err);
     document.getElementById('erro-conexao').innerHTML =
-      `<strong>Não foi possível carregar os compromissos.</strong> (${esc(err.message||err)})`;
+      `<strong>Não foi possível carregar as tarefas.</strong> (${esc(err.message||err)}) `
+      + `<button class="btn-ghost" style="margin-left:8px;" onclick="carregar()">🔄 Tentar de novo</button>`;
+    document.getElementById('tiles-wrap').innerHTML = '';
+    document.getElementById('quadro-wrap').innerHTML = '';
   }
 }
 
 async function carregarAgendas(){
   try{
-    const { data, error } = await sb.from('prazos_agendas')
-      .select('id,data,responsavel,cliente,descricao_tarefa,grupo_processo,numero_processo,matricula,situacao_pasta')
-      .eq('tipo_agenda', 'Agenda')
-      .neq('situacao_pasta', 'Encerrado')
-      .order('data', { ascending: true })
-      .limit(1500);
+    const { data, error } = await comTimeout(
+      sb.from('prazos_agendas')
+        .select('id,data,responsavel,cliente,descricao_tarefa,grupo_processo,numero_processo,matricula,situacao_pasta')
+        .eq('tipo_agenda', 'Agenda').neq('situacao_pasta', 'Encerrado').order('data', { ascending: true }).limit(1500),
+      15000, 'as Agendas'
+    );
     if(error) throw error;
     AGENDAS = data || [];
-    const { data: statusData, error: err2 } = await sb.from('agendas_status_compromissos').select('*');
+    const { data: statusData, error: err2 } = await comTimeout(
+      sb.from('agendas_status_compromissos').select('*'), 15000, 'o status das Agendas'
+    );
     if(err2) throw err2;
     AGENDAS_STATUS = {};
     (statusData||[]).forEach(s => { AGENDAS_STATUS[s.agenda_id] = s; });
@@ -1121,6 +1146,10 @@ async function carregarAgendas(){
   }catch(err){
     console.error(err);
     toast('Não foi possível carregar as Agendas do dashboard de prazos: ' + (err.message||err), true);
+    if(ORIGEM_ATIVA === 'agendas'){
+      document.getElementById('quadro-wrap').innerHTML =
+        `<div class="empty-state" style="grid-column:1/-1;">Falha ao carregar Agendas. <button class="btn-ghost" onclick="carregarAgendas()">🔄 Tentar de novo</button></div>`;
+    }
   }
 }
 
